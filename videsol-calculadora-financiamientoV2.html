@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIDESOL — Calculadora de Financiamiento</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:        #030a0f;
+  --surface:   #07131d;
+  --surface-2: #0b1c2a;
+  --surface-3: #0f2337;
+  --border:    rgba(0,229,255,.09);
+  --border-2:  rgba(0,229,255,.20);
+  --border-3:  rgba(0,229,255,.45);
+
+  --cyan:      #00e5ff;
+  --cyan-g:    rgba(0,229,255,.15);
+  --cyan-g2:   rgba(0,229,255,.07);
+  --green:     #00ff9d;
+  --green-g:   rgba(0,255,157,.08);
+  --amber:     #ffb300;
+  --amber-g:   rgba(255,179,0,.09);
+  --red:       #ff3d71;
+  --red-g:     rgba(255,61,113,.09);
+  --violet:    #b388ff;
+  --violet-g:  rgba(179,136,255,.09);
+
+  --t1: #e8f8ff;
+  --t2: #7aabbd;
+  --t3: #3d6070;
+
+  --mono: 'Geist Mono', monospace;
+  --sans: 'Geist', system-ui, sans-serif;
+  --r: 6px;
+  --th: 52px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--t1);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,229,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,.022) 1px,transparent 1px);
+  background-size:32px 32px;
+}
+
+/* ── SIDEBAR ─────────────────────── */
+
+
+
+/* ── MAIN ─────────────────────────── */
+.main{
+  width:100%;
+  display:flex;flex-direction:column;
+  min-height:100vh;
+}
+/* ── TOPBAR ───────────────────────── */
+.topbar{
+  height:var(--th);
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 32px;gap:12px;
+  position:sticky;top:0;z-index:30;
+  width:100%;
+}
+.tb-crumb{font-family:var(--mono);font-size:10px;color:var(--t3);letter-spacing:1px;flex:1;}
+.tb-sep{color:var(--t3);margin:0 4px;}
+.tb-hi{color:var(--t2);}
+
+.pill{
+  display:flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10px;
+  padding:3px 10px;border-radius:20px;
+  border:1px solid;
+}
+.pill-green{color:var(--green);border-color:rgba(0,255,157,.2);background:var(--green-g);}
+.pill-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 6px var(--green);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.tb-btn{
+  width:30px;height:30px;border:1px solid var(--border-2);
+  border-radius:var(--r);background:transparent;
+  color:var(--t2);cursor:pointer;font-size:13px;
+  display:grid;place-items:center;transition:all .15s;
+}
+.tb-btn:hover{border-color:var(--border-3);color:var(--cyan);background:var(--cyan-g);}
+
+/* ── PAGE ─────────────────────────── */
+.page{padding:24px 32px 48px;max-width:1400px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:18px;}
+
+.pg-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;}
+.pg-title{font-size:17px;font-weight:600;color:var(--t1);}
+.pg-sub{font-size:10px;color:var(--t3);margin-top:3px;font-family:var(--mono);letter-spacing:.5px;}
+.pg-badges{display:flex;gap:7px;align-items:center;flex-shrink:0;}
+
+/* ── BADGE ────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-family:var(--mono);font-size:9px;
+  border-radius:20px;padding:2px 9px;border:1px solid;white-space:nowrap;
+}
+.bc{color:var(--cyan);border-color:var(--border-2);background:var(--cyan-g2);}
+.bg{color:var(--green);border-color:rgba(0,255,157,.22);background:var(--green-g);}
+.ba{color:var(--amber);border-color:rgba(255,179,0,.25);background:var(--amber-g);}
+.br{color:var(--red);border-color:rgba(255,61,113,.25);background:var(--red-g);}
+.bv{color:var(--violet);border-color:rgba(179,136,255,.25);background:var(--violet-g);}
+.bm{color:var(--t3);border-color:var(--border);background:var(--surface-2);}
+
+/* ── CREDIT MODE TABS ─────────────── */
+.mode-tabs{
+  display:flex;gap:2px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:3px;
+}
+.mode-tab{
+  flex:1;padding:8px 16px;
+  border:none;border-radius:4px;
+  background:transparent;
+  color:var(--t2);font-family:var(--sans);
+  font-size:12.5px;font-weight:500;
+  cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.mode-tab:hover{color:var(--t1);background:var(--surface-2);}
+.mode-tab.on-normal{
+  background:var(--cyan-g2);color:var(--cyan);
+  box-shadow:0 0 0 1px var(--border-2) inset;
+}
+.mode-tab.on-especial{
+  background:var(--violet-g);color:var(--violet);
+  box-shadow:0 0 0 1px rgba(179,136,255,.2) inset;
+}
+.mode-tab .tab-lbl{font-size:9px;font-family:var(--mono);opacity:.65;margin-left:2px;}
+
+/* ── METRIC CARDS ─────────────────── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.mcard{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:15px 16px;position:relative;overflow:hidden;
+}
+.mcard.hi{border-color:var(--border-2);}
+.mcard.hi::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+.mcard.hi-v::after{
+  background:linear-gradient(90deg,transparent,var(--violet),transparent);
+}
+.mcard.hi-v{border-color:rgba(179,136,255,.22);}
+
+.ml{
+  font-size:9px;font-weight:500;color:var(--t3);
+  letter-spacing:1.2px;text-transform:uppercase;
+  margin-bottom:9px;font-family:var(--mono);
+}
+.mv{
+  font-family:var(--mono);font-size:20px;font-weight:500;
+  color:var(--t1);line-height:1;
+}
+.mv.c{color:var(--cyan);text-shadow:0 0 18px var(--cyan-g);}
+.mv.a{color:var(--amber);}
+.mv.v{color:var(--violet);text-shadow:0 0 18px var(--violet-g);}
+.ms{font-size:10px;color:var(--t3);margin-top:5px;font-family:var(--mono);}
+.mc{font-size:11px;color:var(--t3);margin-right:2px;}
+
+/* diff cards row */
+.diff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.diff-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:13px 15px;
+  display:flex;align-items:center;gap:12px;
+}
+.diff-icon{font-size:20px;flex-shrink:0;}
+.diff-label{font-size:10px;color:var(--t3);font-family:var(--mono);letter-spacing:.5px;margin-bottom:3px;}
+.diff-val{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--green);}
+.diff-val.neg{color:var(--red);}
+.diff-sub{font-size:9px;color:var(--t3);margin-top:2px;font-family:var(--mono);}
+
+/* ── CARD ─────────────────────────── */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);
+}
+.ch{
+  padding:14px 17px 12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.ct{font-size:12.5px;font-weight:600;color:var(--t1);}
+.cd{font-size:10px;color:var(--t3);margin-top:2px;}
+.cb{padding:17px;}
+.cb-sm{padding:13px 17px;}
+
+/* ── LAYOUT ───────────────────────── */
+.grid-aside{display:grid;grid-template-columns:296px 1fr;gap:14px;align-items:start;}
+
+/* ── FORM ─────────────────────────── */
+.field{display:flex;flex-direction:column;gap:5px;}
+.fl{
+  font-size:11px;font-weight:500;color:var(--t2);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.fh{font-size:10px;color:var(--t3);}
+
+.iw{position:relative;}
+.ipfx{
+  position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:11px;color:var(--t3);pointer-events:none;
+}
+.isfx{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  font-family:var(--mono);font-size:9px;color:var(--t3);pointer-events:none;
+}
+input[type=number]{
+  width:100%;
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:var(--r);color:var(--t1);
+  font-family:var(--mono);font-size:13px;
+  padding:8px 10px 8px 26px;outline:none;
+  transition:border-color .15s,box-shadow .15s;
+  -moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(0,229,255,.09);
+}
+input[type=number]::placeholder{color:var(--t3);}
+
+/* seg ctrl */
+.segctrl{
+  display:grid;grid-template-columns:1fr 1fr;
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:var(--r);padding:3px;gap:3px;
+}
+.segbtn{
+  background:transparent;border:none;border-radius:4px;
+  color:var(--t2);font-family:var(--sans);font-size:12px;font-weight:500;
+  padding:7px 8px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.segbtn:hover{color:var(--t1);background:var(--surface-3);}
+.segbtn.an{background:var(--cyan-g2);color:var(--cyan);box-shadow:0 0 0 1px var(--border-2) inset;}
+.segbtn.ae{background:var(--green-g);color:var(--green);box-shadow:0 0 0 1px rgba(0,255,157,.18) inset;}
+.seg-rate{font-family:var(--mono);font-size:9px;opacity:.65;}
+
+/* sub-toggle: 0km / usado */
+.subtog{
+  display:grid;grid-template-columns:1fr 1fr;
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:var(--r);padding:2px;gap:2px;
+}
+.subbtn{
+  background:transparent;border:none;border-radius:4px;
+  color:var(--t3);font-family:var(--sans);font-size:11.5px;font-weight:500;
+  padding:6px 8px;cursor:pointer;transition:all .15s;text-align:center;
+}
+.subbtn:hover{color:var(--t2);background:var(--surface-3);}
+.subbtn.on{background:var(--violet-g);color:var(--violet);box-shadow:0 0 0 1px rgba(179,136,255,.18) inset;}
+
+/* plazo chips */
+.chips{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
+.chip{
+  background:var(--surface-2);border:1px solid var(--border-2);
+  border-radius:var(--r);color:var(--t2);
+  font-family:var(--sans);font-size:12px;font-weight:500;
+  padding:8px 4px;cursor:pointer;text-align:center;
+  transition:all .15s;line-height:1;
+}
+.chip span{display:block;font-size:9px;font-family:var(--mono);color:var(--t3);margin-top:2px;}
+.chip:hover{border-color:var(--border-3);color:var(--t1);}
+.chip.on{background:var(--cyan-g2);border-color:var(--cyan);color:var(--cyan);}
+.chip.disabled{opacity:.28;cursor:not-allowed;pointer-events:none;}
+
+/* cotiz */
+.cotrow{display:flex;align-items:flex-end;gap:7px;}
+.cotrow .iw{flex:1;}
+.cotstatus{
+  font-family:var(--mono);font-size:9px;
+  height:34px;display:flex;align-items:center;
+  padding:0 9px;white-space:nowrap;
+  border:1px solid var(--border-2);border-radius:var(--r);
+  background:var(--surface-2);color:var(--t3);transition:color .3s;
+  flex-shrink:0;
+}
+
+/* sep */
+.sep{height:1px;background:var(--border);margin:4px 0;}
+
+/* ── ELIGIBILITY ──────────────────── */
+.eligbox{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.elig-hd{
+  padding:9px 14px;border-bottom:1px solid var(--border);
+  font-size:10px;font-weight:600;color:var(--t2);
+  letter-spacing:1px;text-transform:uppercase;font-family:var(--mono);
+  display:flex;align-items:center;gap:7px;
+}
+.erow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 14px;border-bottom:1px solid var(--border);
+}
+.erow:last-child{border-bottom:none;}
+.ek{color:var(--t3);font-family:var(--mono);font-size:10px;letter-spacing:.3px;}
+.ev{font-family:var(--mono);font-size:11px;color:var(--t1);}
+.ev.c{color:var(--cyan);}
+.ev.g{color:var(--green);}
+.ev.a{color:var(--amber);}
+.ev.r{color:var(--red);}
+.ev.v{color:var(--violet);}
+
+/* ── TABLE ────────────────────────── */
+.twrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--border-2);}
+th{
+  font-family:var(--mono);font-size:9px;font-weight:500;
+  color:var(--t3);letter-spacing:1.5px;text-transform:uppercase;
+  padding:9px 13px;text-align:right;white-space:nowrap;
+}
+th:first-child{text-align:left;}
+tbody tr{
+  border-bottom:1px solid var(--border);cursor:pointer;
+  transition:background .12s;
+}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.018);}
+tbody tr.ron{background:rgba(0,229,255,.046);}
+tbody tr.ron td:first-child{border-left:2px solid var(--cyan);padding-left:11px;}
+td{
+  font-family:var(--mono);font-size:11.5px;
+  color:var(--t2);padding:10px 13px;
+  text-align:right;vertical-align:middle;
+}
+td:first-child{text-align:left;}
+
+.td-pl{font-size:13px;font-weight:600;color:var(--t1);font-family:var(--sans);}
+.td-pl small{font-family:var(--mono);font-size:9px;color:var(--t3);display:block;margin-top:1px;}
+.td-q{color:var(--cyan);font-size:12px;}
+.td-qv{color:var(--violet);font-size:12px;}
+.td-sub{font-size:9px;color:var(--t3);margin-top:2px;}
+.td-int{color:var(--amber);}
+.td-save{color:var(--green);}
+
+.mbar{height:2px;background:var(--surface-3);border-radius:2px;margin-top:5px;overflow:hidden;}
+.mbar-fill{height:100%;border-radius:2px;transition:width .4s ease;}
+.mbar-fill.c{background:var(--cyan);}
+.mbar-fill.v{background:var(--violet);}
+
+/* empty */
+.empty{
+  padding:44px 24px;text-align:center;
+  color:var(--t3);font-family:var(--mono);font-size:11px;letter-spacing:1px;
+}
+.empty-ico{font-size:26px;margin-bottom:10px;opacity:.28;}
+
+/* disclaimer */
+.disc{
+  font-family:var(--mono);font-size:10px;color:var(--t3);
+  line-height:1.7;padding:13px 17px;border-top:1px solid var(--border);
+}
+.disc strong{color:var(--amber);}
+
+/* ── RESPONSIVE ───────────────────── */
+@media(max-width:960px){
+  .grid-aside{grid-template-columns:1fr}
+  .metrics{grid-template-columns:1fr 1fr}
+  .diff-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .metrics{grid-template-columns:1fr}
+  .chips{grid-template-columns:repeat(3,1fr)}
+  .diff-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="tb-crumb" style="flex:1">
+      <span>VIDESOL</span><span class="tb-sep">/</span>
+      <span class="tb-hi">Calculadora de Financiamiento</span>
+    </div>
+    <div class="pill pill-green">
+      <span class="pill-dot"></span>SISTEMA ACTIVO
+    </div>
+    <button class="tb-btn" onclick="fetchCotiz()" title="Actualizar cotizaciones">⟳</button>
+  </header>
+
+  <!-- PAGE -->
+  <div class="page">
+
+    <!-- Header row -->
+    <div class="pg-header">
+      <div>
+        <div class="pg-title">Calculadora de Financiamiento</div>
+        <div class="pg-sub">// HERRAMIENTA INTERNA VIDESOL</div>
+      </div>
+      <div class="pg-badges">
+        <span class="badge bc" id="ui-badge-top">UI: —</span>
+        <span class="badge bm" id="usd-badge-top">USD: —</span>
+      </div>
+    </div>
+
+    <!-- MODE TABS -->
+    <div class="mode-tabs">
+      <button class="mode-tab on-normal" id="tab-normal" onclick="setMode('normal')">
+        ◈ Crédito Normal <span class="tab-lbl">Santander My Auto</span>
+      </button>
+      <button class="mode-tab" id="tab-especial" onclick="setMode('especial')">
+        ✦ Crédito Especial <span class="tab-lbl">Tasa 0% — Scotiabank</span>
+      </button>
+    </div>
+
+    <!-- METRIC CARDS -->
+    <div class="metrics" id="metrics-row">
+      <div class="mcard">
+        <div class="ml">Monto Financiado</div>
+        <div class="mv" id="m-fin">—</div>
+        <div class="ms" id="m-fin-s">precio menos entrada</div>
+      </div>
+      <div class="mcard hi" id="mcard-cuota">
+        <div class="ml">Cuota Mensual</div>
+        <div class="mv c" id="m-cuota">—</div>
+        <div class="ms" id="m-cuota-s">plan seleccionado</div>
+      </div>
+      <div class="mcard">
+        <div class="ml">Total a Pagar</div>
+        <div class="mv" id="m-total">—</div>
+        <div class="ms" id="m-total-s">capital + intereses</div>
+      </div>
+      <div class="mcard">
+        <div class="ml">Costo Financiero</div>
+        <div class="mv a" id="m-int">—</div>
+        <div class="ms" id="m-int-s">intereses totales</div>
+      </div>
+    </div>
+
+    <!-- DIFERENCIAL (solo modo especial) -->
+    <div id="diff-section" style="display:none;">
+      <div class="diff-row">
+        <div class="diff-card">
+          <div class="diff-icon">💰</div>
+          <div>
+            <div class="diff-label">DIFERENCIA TOTAL FINAL</div>
+            <div class="diff-val" id="d-ahorro">—</div>
+            <div class="diff-sub" id="d-ahorro-s">vs crédito normal</div>
+          </div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon">📉</div>
+          <div>
+            <div class="diff-label">DIFERENCIA CUOTA / MES</div>
+            <div class="diff-val" id="d-cuota-diff">—</div>
+            <div class="diff-sub" id="d-cuota-diff-s">por mes vs normal</div>
+          </div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon">⚖️</div>
+          <div>
+            <div class="diff-label">TASA ADMINISTRATIVA</div>
+            <div class="diff-val neg" id="d-comision">—</div>
+            <div class="diff-sub" id="d-comision-s">incluida en el capital</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID PRINCIPAL -->
+    <div class="grid-aside">
+
+      <!-- LEFT: INPUTS -->
+      <div style="display:flex;flex-direction:column;gap:13px;">
+
+        <!-- Vehículo -->
+        <div class="card">
+          <div class="ch">
+            <div><div class="ct">Datos del Vehículo</div><div class="cd">Tipo, precio y entrada</div></div>
+          </div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:13px;">
+
+            <div class="field">
+              <div class="fl">Tipo de vehículo</div>
+              <div class="segctrl">
+                <button class="segbtn an" id="btn-nafta" onclick="setTipo('nafta')">
+                  ⛽ Nafta <span class="seg-rate">8% TEA</span>
+                </button>
+                <button class="segbtn" id="btn-elec" onclick="setTipo('electrico')">
+                  ⚡ Eléctrico <span class="seg-rate">5% TEA</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- sub-toggle 0km / usado — solo en modo especial -->
+            <div class="field" id="field-km" style="display:none;">
+              <div class="fl">Estado del vehículo <span class="fh">crédito especial</span></div>
+              <div class="subtog">
+                <button class="subbtn on" id="btn-0km" onclick="setKm('0km')">0 km</button>
+                <button class="subbtn" id="btn-usado" onclick="setKm('usado')">Usado (≤7 años)</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="fl">Precio del vehículo <span class="fh">USD</span></div>
+              <div class="iw">
+                <span class="ipfx">$</span>
+                <input type="number" id="precio" min="0" step="100" placeholder="0" oninput="calcular()">
+                <span class="isfx">USD</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="fl">Entrada / anticipo <span class="fh">USD</span></div>
+              <div class="iw">
+                <span class="ipfx">$</span>
+                <input type="number" id="entrada" min="0" step="100" placeholder="0" value="0" oninput="calcular()">
+                <span class="isfx">USD</span>
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="fl">Plazo en cuotas</div>
+              <div class="chips" id="chips"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Cotizaciones -->
+        <div class="card">
+          <div class="ch">
+            <div><div class="ct">Cotizaciones BCU</div><div class="cd">En tiempo real · editables</div></div>
+            <button class="tb-btn" onclick="fetchCotiz()" title="Actualizar">⟳</button>
+          </div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:12px;">
+            <div class="field">
+              <div class="fl">Unidad Indexada (UI) <span class="fh">$ UYU</span></div>
+              <div class="cotrow">
+                <div class="iw"><span class="ipfx">$</span>
+                  <input type="number" id="ui-val" min="1" step="0.0001" value="6.85" oninput="calcular()">
+                </div>
+                <div class="cotstatus" id="ui-st">—</div>
+              </div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:2px;" id="ui-fecha"></div>
+            </div>
+            <div class="field">
+              <div class="fl">Dólar americano (USD) <span class="fh">$ UYU</span></div>
+              <div class="cotrow">
+                <div class="iw"><span class="ipfx">$</span>
+                  <input type="number" id="usd-val" min="1" step="0.01" value="40.00" oninput="calcular()">
+                </div>
+                <div class="cotstatus" id="usd-st">—</div>
+              </div>
+              <div style="font-family:var(--mono);font-size:9px;color:var(--t3);margin-top:2px;" id="usd-fecha"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Elegibilidad -->
+        <div class="card">
+          <div class="ch">
+            <div><div class="ct">Elegibilidad del Cliente</div><div class="cd">Capacidad de pago · Santander</div></div>
+          </div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:13px;">
+            <div class="field">
+              <div class="fl">Ingreso mensual <span class="fh">$ UYU</span></div>
+              <div class="iw">
+                <span class="ipfx">$</span>
+                <input type="number" id="ingreso" min="0" step="500" placeholder="0" oninput="calcular()">
+                <span class="isfx">UYU</span>
+              </div>
+            </div>
+            <div class="sep"></div>
+            <div class="eligbox">
+              <div class="elig-hd"><span style="color:var(--cyan)">◈</span>Análisis de Elegibilidad</div>
+              <div id="elig-content">
+                <div class="erow" style="padding:12px 14px;">
+                  <span class="ek">ESTADO</span>
+                  <span class="ev" style="color:var(--t3)">Ingrese el salario del cliente…</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: TABLA -->
+      <div>
+        <div class="card">
+          <div class="ch">
+            <div>
+              <div class="ct" id="tabla-titulo">Comparativa de Plazos</div>
+              <div class="cd">Hacé clic en una fila para seleccionar el plan</div>
+            </div>
+            <span class="badge bc" id="tipo-badge">NAFTA · TEA 8%</span>
+          </div>
+          <div class="twrap" id="twrap">
+            <div class="empty"><div class="empty-ico">◈</div>Ingrese el precio del vehículo para ver el análisis</div>
+          </div>
+          <div class="disc" id="disc" style="display:none;"></div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /page -->
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+const TASAS_NORMAL = {
+  nafta:    {12:.08,24:.08,36:.08,48:.08,60:.08,72:.08},
+  electrico:{12:.05,24:.05,36:.05,48:.05,60:.05,72:.05}
+};
+
+// Crédito especial — TEA 0%
+// Tasa administrativa sobre monto a financiar (+IVA 22%)
+// 0km: 12c=3%, 24c=3%, 36c=3%, 48c=4.5%
+// Usado: 12c=4%, 24c=4%, 35c→36c=4%  (máx 36c para usados)
+const COMISION_ESP = {
+  '0km':  {12:.03,24:.03,36:.03,48:.045},
+  'usado':{12:.04,24:.04,36:.04}
+};
+const IVA = 0.22;
+
+// Seguro de vida: 3‰ mensual sobre saldo de capital (decreciente)
+// Prima = 3/1000 por mes sobre saldo restante → promedio: calculamos suma total
+const SEG_VIDA_PROMIL = 0.003; // 3‰ mensual
+
+// Ratio cuota/ingreso Santander (derivado caso real Tatiana)
+const RATIO = 0.2625;
+
+const PLAZOS = [12,24,36,48,60,72];
+
+// ═══════════════════════════════════════════
+let modo      = 'normal';   // 'normal' | 'especial'
+let tipoVeh   = 'nafta';    // 'nafta' | 'electrico'
+let kmEst     = '0km';      // '0km' | 'usado'
+let plazoSel  = 48;
+
+// ── INIT ─────────────────────────────────
+function renderChips() {
+  const el = document.getElementById('chips');
+  el.innerHTML = PLAZOS.map(p => {
+    // 72 cuotas: solo disponible en modo normal con eléctrico
+    const hide72 = (p === 72 && tipoVeh !== 'electrico');
+    // En crédito especial, 48c solo 0km, usados máx 36c
+    let disabled = false;
+    if (modo === 'especial') {
+      const plazoOpts = Object.keys(COMISION_ESP[kmEst]).map(Number);
+      if (!plazoOpts.includes(p)) disabled = true;
+    }
+    if (hide72) disabled = true;
+
+    if (disabled && plazoSel === p) {
+      // auto-reset selection
+      setTimeout(() => { plazoSel = 36; renderChips(); calcular(); }, 0);
+    }
+
+    return `<div class="chip${plazoSel===p?' on':''}${disabled?' disabled':''}"
+      ${disabled?'':` onclick="setPlazo(${p})"`}>
+      ${p}<span>meses</span>
+    </div>`;
+  }).join('');
+}
+
+function setMode(m) {
+  modo = m;
+  document.getElementById('tab-normal').className   = 'mode-tab' + (m==='normal'   ? ' on-normal'   : '');
+  document.getElementById('tab-especial').className = 'mode-tab' + (m==='especial' ? ' on-especial' : '');
+
+  // mostrar/ocultar campo 0km/usado
+  document.getElementById('field-km').style.display = m==='especial' ? '' : 'none';
+
+  // diff section
+  document.getElementById('diff-section').style.display = m==='especial' ? '' : 'none';
+
+  // metric card cuota — color según modo
+  const mc = document.getElementById('mcard-cuota');
+  const mv = document.getElementById('m-cuota');
+  if (m==='especial') {
+    mc.classList.remove('hi'); mc.classList.add('hi-v');
+    mv.classList.remove('c'); mv.classList.add('v');
+  } else {
+    mc.classList.remove('hi-v'); mc.classList.add('hi');
+    mv.classList.remove('v'); mv.classList.add('c');
+  }
+
+  // titulo tabla
+  document.getElementById('tabla-titulo').textContent =
+    m==='especial' ? 'Crédito Especial — Tasa 0%' : 'Comparativa de Plazos';
+
+  renderChips();
+  calcular();
+}
+
+function setTipo(t) {
+  tipoVeh = t;
+  document.getElementById('btn-nafta').className = 'segbtn' + (t==='nafta'     ? ' an' : '');
+  document.getElementById('btn-elec').className  = 'segbtn' + (t==='electrico' ? ' ae' : '');
+  document.getElementById('tipo-badge').textContent = t==='nafta'
+    ? 'NAFTA · TEA 8%' : 'ELÉCTRICO · TEA 5%';
+
+  // 72c solo eléctrico — si era nafta y tenía 72 seleccionado, resetear
+  if (t==='nafta' && plazoSel===72) { plazoSel=48; }
+
+  renderChips();
+  calcular();
+}
+
+function setKm(k) {
+  kmEst = k;
+  document.getElementById('btn-0km').className   = 'subbtn' + (k==='0km'   ? ' on' : '');
+  document.getElementById('btn-usado').className  = 'subbtn' + (k==='usado' ? ' on' : '');
+  // reset plazo si no disponible
+  const opts = Object.keys(COMISION_ESP[k]).map(Number);
+  if (!opts.includes(plazoSel)) plazoSel = Math.max(...opts);
+  renderChips();
+  calcular();
+}
+
+function setPlazo(p) {
+  plazoSel = p;
+  renderChips();
+  calcular();
+}
+
+// ── MATH ─────────────────────────────────
+// Sistema francés: cuota = P·i/(1-(1+i)^-n)
+function cuotaFrances(P, tea, n) {
+  if (P<=0||n<=0) return 0;
+  const i = tea/12;
+  return i===0 ? P/n : P*i/(1-Math.pow(1+i,-n));
+}
+
+// Seguro de vida: prima = 3‰ del saldo de capital en cada período
+// Suma total de primas = 3‰ × Σ saldo_k  (sistema francés, saldo decreciente)
+function seguroTotal(P, tea, n) {
+  const i = tea/12;
+  let saldo = P, total = 0;
+  const cuota = cuotaFrances(P, tea, n);
+  for (let k=0; k<n; k++) {
+    const intPer = saldo * i;
+    const amort  = cuota - intPer;
+    total += saldo * SEG_VIDA_PROMIL;
+    saldo -= amort;
+    if (saldo < 0) saldo = 0;
+  }
+  return total;
+}
+
+// Seguro para tasa 0: saldo decrece linealmente
+function seguroTotalTasa0(P, n) {
+  const cuota = P/n;
+  let saldo = P, total = 0;
+  for (let k=0; k<n; k++) {
+    total += saldo * SEG_VIDA_PROMIL;
+    saldo -= cuota;
+    if (saldo<0) saldo=0;
+  }
+  return total;
+}
+
+// Seguro por cuota promedio (para mostrar)
+function seguroPorCuotaPromedio(totalSeg, n) { return totalSeg/n; }
+
+// Capital máximo aprobable dado ingreso (Santander normal)
+function maxCapUSD(ingresoPesos, uiV, usdV, tea, n) {
+  const cuotaMaxUI = (ingresoPesos * RATIO) / uiV;
+  const i = tea/12;
+  const capUI = i===0 ? cuotaMaxUI*n : cuotaMaxUI*(1-Math.pow(1+i,-n))/i;
+  return capUI*uiV/usdV;
+}
+
+function fmt(n,d=0){ return n.toLocaleString('es-UY',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+
+// ── FETCH BCU ─────────────────────────────
+async function fetchCotiz() {
+  ['ui-st','usd-st'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.textContent='cargando…';el.style.color='var(--t3)';
+  });
+  const fetchOne = async(ep,inpId,stId,fId,badgeId,lbl) => {
+    try {
+      const r = await fetch('https://uy.dolarapi.com/v1/cotizaciones/'+ep);
+      if(!r.ok) throw new Error();
+      const d = await r.json();
+      const v = d.venta||d.compra||d.valor;
+      if(!v) throw new Error();
+      document.getElementById(inpId).value = parseFloat(v).toFixed(4);
+      const st=document.getElementById(stId);
+      st.textContent='● OFICIAL';st.style.color='var(--green)';
+      const f=d.fechaActualizacion?d.fechaActualizacion.slice(0,10):'';
+      document.getElementById(fId).textContent=f?'// BCU · '+f:'';
+      document.getElementById(badgeId).textContent=lbl+': $'+parseFloat(v).toFixed(2);
+    } catch {
+      const st=document.getElementById(stId);
+      st.textContent='⚠ MANUAL';st.style.color='var(--amber)';
+      document.getElementById(fId).textContent='// sin conexión';
+    }
+    calcular();
+  };
+  await Promise.all([
+    fetchOne('ui', 'ui-val','ui-st','ui-fecha','ui-badge-top','UI'),
+    fetchOne('usd','usd-val','usd-st','usd-fecha','usd-badge-top','USD'),
+  ]);
+}
+
+// ── CALCULAR ─────────────────────────────
+function calcular() {
+  const precio  = parseFloat(document.getElementById('precio').value)||0;
+  const entrada = parseFloat(document.getElementById('entrada').value)||0;
+  const ingreso = parseFloat(document.getElementById('ingreso').value)||0;
+  const uiV     = parseFloat(document.getElementById('ui-val').value)||6.85;
+  const usdV    = parseFloat(document.getElementById('usd-val').value)||40;
+
+  const finUSD = Math.max(0, precio-entrada);
+  const finUI  = finUSD * usdV / uiV;
+
+  if (modo==='normal') calcNormal(finUSD, finUI, ingreso, uiV, usdV);
+  else                  calcEspecial(finUSD, finUI, ingreso, uiV, usdV, precio, entrada);
+}
+
+// ── MODO NORMAL ───────────────────────────
+function calcNormal(finUSD, finUI, ingreso, uiV, usdV) {
+  const rows = PLAZOS.map(n => {
+    const tea     = TASAS_NORMAL[tipoVeh][n];
+    const cuotaUI = cuotaFrances(finUI, tea, n);
+    const totalUI = cuotaUI * n;
+    const intUI   = totalUI - finUI;
+    const cpesos  = cuotaUI * uiV;
+    const cuotaUSD= cpesos / usdV;
+    const totalUSD= totalUI*uiV/usdV;
+    const intUSD  = intUI*uiV/usdV;
+    let maxU=0, elig=null;
+    if (ingreso>0) { maxU=maxCapUSD(ingreso,uiV,usdV,tea,n); elig=finUSD<=maxU; }
+    return {n,tea,cuotaUI,cuotaUSD,cpesos,totalUI,totalUSD,intUI,intUSD,maxU,elig};
+  });
+
+  const sel = rows.find(r=>r.n===plazoSel);
+  updateMetrics(sel, finUSD, finUI);
+  renderElig(sel, ingreso, uiV, usdV, finUSD);
+  renderTablaNormal(rows, finUSD, ingreso);
+}
+
+// ── MODO ESPECIAL ─────────────────────────
+function calcEspecial(finUSD, finUI, ingreso, uiV, usdV, precio, entrada) {
+  const plazoOpts = Object.keys(COMISION_ESP[kmEst]).map(Number);
+
+  const rows = plazoOpts.map(n => {
+    const comTasa = COMISION_ESP[kmEst][n];
+    const comUI   = finUI * comTasa * (1+IVA);   // tasa admin. sobre monto a financiar +IVA
+    const capitalUI = finUI + comUI;              // capital total que el banco presta (ya incluye tasa admin.)
+    const cuotaBase = capitalUI / n;              // TEA 0% → cuota fija = capital/n
+    const segTotal  = seguroTotalTasa0(capitalUI, n);
+    const segPorCuota = segTotal / n;
+    const cuotaTotal  = cuotaBase + segPorCuota; // cuota + seguro promedio
+    const totalPagado = cuotaTotal * n;
+    const intTot = totalPagado - finUI;           // costo total vs capital original
+
+    // equivalentes en pesos y USD para mostrar
+    const cuotaTotalPesos = cuotaTotal * uiV;
+    const cuotaTotalUSD   = cuotaTotalPesos / usdV;
+    const totalUSD        = totalPagado * uiV / usdV;
+    const comUSD          = comUI * uiV / usdV;
+
+    // Comparar vs normal mismo plazo
+    const teaN  = TASAS_NORMAL[tipoVeh][n] || TASAS_NORMAL['nafta'][n];
+    const cuotaNorm = cuotaFrances(finUI, teaN, n);
+    const totalNorm = cuotaNorm * n;
+    const ahorroInt = (totalNorm - finUI) - (cuotaBase*n - finUI); // ahorro en intereses puros
+    const diffCuota = cuotaNorm - cuotaBase;  // diferencia cuota base (sin seg en ambos)
+
+    return {n, comTasa, comUI, comUSD, capitalUI, cuotaBase, segPorCuota,
+            cuotaTotal, cuotaTotalPesos, cuotaTotalUSD, totalPagado, totalUSD,
+            intTot, ahorroInt, diffCuota};
+  });
+
+  const sel = rows.find(r=>r.n===plazoSel) || rows[rows.length-1];
+  if (sel && plazoSel!==sel.n) { plazoSel=sel.n; renderChips(); }
+
+  updateMetricsEsp(sel, finUSD, finUI);
+  renderDiff(sel, uiV, usdV);
+  renderEligEsp(sel, ingreso, uiV, usdV, finUSD);
+  renderTablaEsp(rows, finUSD, ingreso, uiV, usdV);
+}
+
+// ── METRICS ──────────────────────────────
+function updateMetrics(sel, finUSD, finUI) {
+  const uiV = parseFloat(document.getElementById('ui-val').value)||6.85;
+  const usdV= parseFloat(document.getElementById('usd-val').value)||40;
+  if (sel && finUSD>0) {
+    document.getElementById('m-fin').innerHTML=`<span class="mc">USD</span>${fmt(finUSD)}`;
+    document.getElementById('m-fin-s').textContent=`UI ${fmt(finUI,0)}`;
+    document.getElementById('m-cuota').innerHTML=`<span class="mc">$</span>${fmt(sel.cpesos,0)} <span style="font-size:13px">UYU</span>`;
+    document.getElementById('m-cuota-s').textContent=`≈ USD ${fmt(sel.cuotaUSD,0)} · UI ${fmt(sel.cuotaUI,2)}`;
+    document.getElementById('m-total').innerHTML=`<span class="mc">USD</span>${fmt(sel.totalUSD,0)}`;
+    document.getElementById('m-total-s').textContent=`UI ${fmt(sel.totalUI,0)}`;
+    document.getElementById('m-int').innerHTML=`<span class="mc">USD</span>${fmt(sel.intUSD,0)}`;
+    document.getElementById('m-int-s').textContent=`UI ${fmt(sel.intUI,0)}`;
+  } else resetMetrics();
+}
+
+function updateMetricsEsp(sel, finUSD, finUI) {
+  if (sel && finUSD>0) {
+    document.getElementById('m-fin').innerHTML=`<span class="mc">USD</span>${fmt(finUSD)}`;
+    document.getElementById('m-fin-s').textContent=`UI ${fmt(finUI,0)}`;
+    document.getElementById('m-cuota').innerHTML=`<span class="mc">$</span>${fmt(sel.cuotaTotalPesos,0)} <span style="font-size:13px">UYU</span>`;
+    document.getElementById('m-cuota-s').textContent=`≈ USD ${fmt(sel.cuotaTotalUSD,0)} · UI ${fmt(sel.cuotaTotal,2)} · + seg. vida`;
+    document.getElementById('m-total').innerHTML=`<span class="mc">USD</span>${fmt(sel.totalUSD,0)}`;
+    document.getElementById('m-total-s').textContent=`UI ${fmt(sel.totalPagado,0)}`;
+    document.getElementById('m-int').innerHTML=`<span class="mc">USD</span>${fmt(sel.comUSD,0)}`;
+    document.getElementById('m-int-s').textContent=`tasa admin. + seguro · UI ${fmt(sel.comUI,0)}`;
+  } else resetMetrics();
+}
+
+function resetMetrics() {
+  ['m-fin','m-cuota','m-total','m-int'].forEach(id=>document.getElementById(id).innerHTML='—');
+  ['m-fin-s','m-cuota-s','m-total-s','m-int-s'].forEach(id=>document.getElementById(id).textContent='');
+}
+
+// ── DIFERENCIAL ───────────────────────────
+function renderDiff(sel, uiV, usdV) {
+  if (!sel) return;
+  const finUSD = Math.max(0,(parseFloat(document.getElementById('precio').value)||0)
+                           -(parseFloat(document.getElementById('entrada').value)||0));
+  if (finUSD<=0) return;
+
+  const finUI  = finUSD * usdV / uiV;
+  const teaN   = TASAS_NORMAL[tipoVeh][sel.n] || TASAS_NORMAL['nafta'][sel.n];
+
+  // ── Crédito NORMAL: capital + intereses + seguro vida
+  const cuotaNormUI  = cuotaFrances(finUI, teaN, sel.n);
+  const segNormTotal = seguroTotal(finUI, teaN, sel.n);
+  const segNormMes   = segNormTotal / sel.n;
+  const cuotaNormTot = cuotaNormUI + segNormMes;
+  const totalNormUI  = cuotaNormTot * sel.n;
+  const totalNormUSD = totalNormUI * uiV / usdV;
+  const costoNormUI  = totalNormUI - finUI;
+  const costoNormUSD = costoNormUI * uiV / usdV;
+
+  // ── Crédito ESPECIAL: capital + tasa admin + seguro vida
+  const totalEspUI   = sel.totalPagado;
+  const totalEspUSD  = sel.totalUSD;
+  const costoEspUI   = sel.comUI + sel.segPorCuota * sel.n;
+  const costoEspUSD  = costoEspUI * uiV / usdV;
+
+  // ── Diferencias
+  const diffTotalUSD = totalNormUSD - totalEspUSD;
+  const diffTotalUI  = totalNormUI  - totalEspUI;
+  const espMasBarato = diffTotalUSD >= 0;
+
+  const diffCuotaUI  = cuotaNormTot - sel.cuotaTotal;
+  const diffCuotaUSD = diffCuotaUI * uiV / usdV;
+  const cuotaMenor   = diffCuotaUI >= 0;
+
+  // Tarjeta 1 — Diferencia total final
+  const t1 = document.getElementById('d-ahorro');
+  t1.textContent = `USD ${fmt(Math.abs(diffTotalUSD),0)}`;
+  t1.className = 'diff-val' + (espMasBarato ? '' : ' neg');
+  document.getElementById('d-ahorro-s').textContent = espMasBarato
+    ? `especial más barato · normal: USD ${fmt(totalNormUSD,0)} · especial: USD ${fmt(totalEspUSD,0)}`
+    : `especial más caro · normal: USD ${fmt(totalNormUSD,0)} · especial: USD ${fmt(totalEspUSD,0)}`;
+
+  // Tarjeta 2 — Diferencia cuota mensual
+  const t2 = document.getElementById('d-cuota-diff');
+  t2.textContent = `USD ${fmt(Math.abs(diffCuotaUSD),0)} / mes`;
+  t2.className = 'diff-val' + (cuotaMenor ? '' : ' neg');
+  document.getElementById('d-cuota-diff-s').textContent = cuotaMenor
+    ? `cuota especial es menor · normal: USD ${fmt(cuotaNormTot*uiV/usdV,0)} · especial: USD ${fmt(sel.cuotaTotalUSD,0)}`
+    : `cuota especial es mayor · normal: USD ${fmt(cuotaNormTot*uiV/usdV,0)} · especial: USD ${fmt(sel.cuotaTotalUSD,0)}`;
+
+  // Tarjeta 3 — Costo real crédito especial
+  document.getElementById('d-comision').textContent = `USD ${fmt(costoEspUSD,0)}`;
+  document.getElementById('d-comision-s').textContent =
+    `tasa adm. ${(sel.comTasa*100).toFixed(1)}%+IVA (USD ${fmt(sel.comUSD,0)}) + seg. vida (USD ${fmt(sel.segPorCuota*sel.n*uiV/usdV,0)}) · costo normal: USD ${fmt(costoNormUSD,0)}`;
+}
+
+// ── ELEGIBILIDAD NORMAL ───────────────────
+function renderElig(sel, ingreso, uiV, usdV, finUSD) {
+  const c = document.getElementById('elig-content');
+  if (!ingreso) {
+    c.innerHTML=`<div class="erow" style="padding:12px 14px;">
+      <span class="ek">ESTADO</span>
+      <span class="ev" style="color:var(--t3)">Ingrese el salario del cliente</span>
+    </div>`; return;
+  }
+  const cMaxPesos = ingreso*RATIO;
+  const cMaxUI    = cMaxPesos/uiV;
+  const cMaxUSD   = cMaxPesos/usdV;
+
+  let h=`
+    <div class="erow"><span class="ek">INGRESO MENSUAL</span><span class="ev">$${fmt(ingreso)} UYU</span></div>
+    <div class="erow"><span class="ek">CUOTA MÁX. (26.25%)</span><span class="ev c">$${fmt(cMaxPesos)} UYU</span></div>
+    <div class="erow"><span class="ek">CUOTA MÁX. EN UI</span><span class="ev">UI ${fmt(cMaxUI,2)}</span></div>
+    <div class="erow"><span class="ek">CUOTA MÁX. EN USD</span><span class="ev">≈ USD ${fmt(cMaxUSD,0)}</span></div>`;
+
+  if (sel && finUSD>0) {
+    const ok=sel.elig; const cls=ok?'g':'r';
+    h+=`<div class="erow" style="border-top:1px solid var(--border-2)">
+      <span class="ek">CUOTA PLAN ${sel.n}C</span>
+      <span class="ev ${cls}">UI ${fmt(sel.cuotaUI,2)} / $${fmt(sel.cpesos,0)}</span>
+    </div>
+    <div class="erow"><span class="ek">ESTADO</span>
+      <span class="ev ${cls}">${ok?'✓ APROBADO':'✗ EXCEDE CAPACIDAD'}</span></div>`;
+    if (!ok) {
+      const precioV = parseFloat(document.getElementById('precio').value)||0;
+      const entMin  = Math.max(0, precioV - sel.maxU);
+      h+=`<div class="erow"><span class="ek">MÁX. FINANCIABLE ${sel.n}C</span>
+        <span class="ev a">USD ${fmt(sel.maxU,0)}</span></div>
+        <div class="erow"><span class="ek">ENTRADA MÍNIMA NECESARIA</span>
+        <span class="ev a">USD ${fmt(entMin,0)}</span></div>`;
+    }
+  }
+  c.innerHTML=h;
+}
+
+// ── ELEGIBILIDAD ESPECIAL ─────────────────
+function renderEligEsp(sel, ingreso, uiV, usdV, finUSD) {
+  const c = document.getElementById('elig-content');
+  if (!ingreso || !sel || finUSD<=0) {
+    c.innerHTML=`<div class="erow" style="padding:12px 14px;">
+      <span class="ek">ESTADO</span>
+      <span class="ev" style="color:var(--t3)">${!ingreso?'Ingrese salario del cliente':'Ingrese precio del vehículo'}</span>
+    </div>`; return;
+  }
+  // Para tasa 0%, el banco también verifica ingreso vs cuota total
+  const cMaxPesos = ingreso*RATIO;
+  const cMaxUI    = cMaxPesos/uiV;
+  const cuotaTotUI= sel.cuotaTotal;
+  const ok = cuotaTotUI <= cMaxUI;
+  const cls = ok?'g':'r';
+
+  // Ingreso mínimo para el plan
+  const ingresoMinUI = cuotaTotUI / RATIO;
+  const ingresoMinPesos = ingresoMinUI * uiV;
+
+  let h=`
+    <div class="erow"><span class="ek">INGRESO MENSUAL</span><span class="ev">$${fmt(ingreso)} UYU</span></div>
+    <div class="erow"><span class="ek">CUOTA TOTAL ${sel.n}C (c/seg.)</span><span class="ev v">UI ${fmt(sel.cuotaTotal,2)}</span></div>
+    <div class="erow"><span class="ek">CUOTA BASE</span><span class="ev">UI ${fmt(sel.cuotaBase,2)}</span></div>
+    <div class="erow"><span class="ek">SEGURO DE VIDA / MES</span><span class="ev">UI ${fmt(sel.segPorCuota,2)}</span></div>
+    <div class="erow" style="border-top:1px solid var(--border-2)">
+      <span class="ek">CUOTA MÁX. (26.25%)</span>
+      <span class="ev c">UI ${fmt(cMaxUI,2)} / $${fmt(cMaxPesos,0)}</span>
+    </div>
+    <div class="erow"><span class="ek">ESTADO</span>
+      <span class="ev ${cls}">${ok?'✓ APROBADO':'✗ EXCEDE CAPACIDAD'}</span></div>`;
+  if (!ok) {
+    h+=`<div class="erow"><span class="ek">INGRESO MÍN. REQUERIDO</span>
+      <span class="ev a">$${fmt(ingresoMinPesos,0)} UYU</span></div>`;
+  }
+  c.innerHTML=h;
+}
+
+// ── TABLA NORMAL ──────────────────────────
+function renderTablaNormal(rows, finUSD, ingreso) {
+  const w = document.getElementById('twrap');
+  const d = document.getElementById('disc');
+  if (finUSD<=0) {
+    w.innerHTML=`<div class="empty"><div class="empty-ico">◈</div>Ingrese precio y entrada</div>`;
+    d.style.display='none'; return;
+  }
+  d.style.display='';
+  d.innerHTML=`<strong>// NOTA:</strong> Sistema francés (interés compuesto) · TEA anual Santander My Auto · Moneda UI · Las cotizaciones BCU se actualizan en tiempo real. Valores orientativos.`;
+
+  const maxQ = Math.max(...rows.map(r=>r.cuotaUI));
+  const tbody = rows.map(r => {
+    const skip = r.n===72 && tipoVeh!=='electrico';
+    if (skip) return '';
+    const pct   = maxQ>0?Math.round(r.cuotaUI/maxQ*100):0;
+    const ron   = r.n===plazoSel?'ron':'';
+    const teaP  = (r.tea*100).toFixed(0);
+    let bg='';
+    if (ingreso>0) bg = r.elig
+      ? `<span class="badge bg">✓ APTO</span>`
+      : `<span class="badge br">✗ EXCEDE</span>`;
+
+    return `<tr class="${ron}" onclick="setPlazo(${r.n})">
+      <td><div class="td-pl">${r.n}<small>cuotas</small></div></td>
+      <td style="color:var(--t3);font-size:10px;">TEA ${teaP}%</td>
+      <td class="td-q">UI ${fmt(r.cuotaUI,2)}
+        <div class="td-sub">$${fmt(r.cpesos,0)} UYU</div>
+        <div class="mbar"><div class="mbar-fill c" style="width:${pct}%"></div></div>
+      </td>
+      <td>UI ${fmt(r.totalUI,0)}<div class="td-sub">≈ USD ${fmt(r.totalUSD,0)}</div></td>
+      <td class="td-int">UI ${fmt(r.intUI,0)}<div class="td-sub">≈ USD ${fmt(r.intUSD,0)}</div></td>
+      <td>${bg}</td>
+    </tr>`;
+  }).join('');
+
+  w.innerHTML=`<table>
+    <thead><tr>
+      <th>PLAZO</th><th>TASA</th><th>CUOTA / MES</th>
+      <th>TOTAL PLAN</th><th>INTERESES</th><th>ELEGIB.</th>
+    </tr></thead>
+    <tbody>${tbody}</tbody>
+  </table>`;
+}
+
+// ── TABLA ESPECIAL ────────────────────────
+function renderTablaEsp(rows, finUSD, ingreso, uiV, usdV) {
+  const w = document.getElementById('twrap');
+  const d = document.getElementById('disc');
+  if (finUSD<=0) {
+    w.innerHTML=`<div class="empty"><div class="empty-ico">◈</div>Ingrese precio y entrada</div>`;
+    d.style.display='none'; return;
+  }
+  d.style.display='';
+  d.innerHTML=`<strong>// CRÉDITO ESPECIAL SCOTIABANK · TASA 0%:</strong> El banco no cobra interés, pero el cliente paga: (1) <strong>Tasa administrativa</strong> sobre el monto financiado +IVA 22% — se suma al capital y se divide en cuotas. (2) <strong>Seguro de vida obligatorio</strong> ~3‰ mensual sobre saldo decreciente. Hasta 80% del valor del vehículo. Valores orientativos.`;
+
+  const maxQ = Math.max(...rows.map(r=>r.cuotaTotal));
+  const tbody = rows.map(r => {
+    const pct     = maxQ>0 ? Math.round(r.cuotaTotal/maxQ*100) : 0;
+    const ron     = r.n===plazoSel ? 'ron' : '';
+    const comPct  = (r.comTasa*100).toFixed(1);
+    const comConIVA = r.comTasa*(1+IVA)*100;
+
+    // Cuota pura del capital original (sin tasa admin. ni seguro)
+    const cuotaCapPuro = (finUSD * usdV / uiV) / r.n;
+    // Cuota por tasa admin.
+    const cuotaCom = r.comUI / r.n;
+
+    // Elegibilidad
+    const cMaxUI = ingreso>0 ? (ingreso*RATIO)/uiV : Infinity;
+    const ok = r.cuotaTotal <= cMaxUI;
+    let bg = '';
+    if (ingreso>0) bg = ok
+      ? `<span class="badge bg">✓ APTO</span>`
+      : `<span class="badge br">✗ EXCEDE</span>`;
+
+    return `<tr class="${ron}" onclick="setPlazo(${r.n});calcular()">
+      <td><div class="td-pl">${r.n}<small>cuotas</small></div></td>
+      <td>
+        <div style="color:var(--green);font-size:11px;font-family:var(--mono);">TEA 0%</div>
+        <div class="td-sub" style="color:var(--amber);">+ tasa adm. ${comPct}% +IVA</div>
+        <div class="td-sub">(≈${comConIVA.toFixed(1)}% real s/fin.)</div>
+      </td>
+      <td>
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;margin-bottom:4px;">
+          <span class="td-sub" style="text-align:right;color:var(--t2);">capital</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--t2);">UI ${fmt(cuotaCapPuro,2)}</span>
+          <span class="td-sub" style="text-align:right;color:var(--amber);">+ tasa adm.*</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--amber);">UI ${fmt(cuotaCom,2)}</span>
+          <span class="td-sub" style="text-align:right;color:var(--t3);">+ seg. vida</span>
+          <span style="font-family:var(--mono);font-size:11px;color:var(--t3);">UI ${fmt(r.segPorCuota,2)}</span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:4px;display:flex;justify-content:space-between;align-items:center;">
+          <span class="td-sub">TOTAL / MES</span>
+          <span class="td-qv">UI ${fmt(r.cuotaTotal,2)}</span>
+        </div>
+        <div class="mbar"><div class="mbar-fill v" style="width:${pct}%"></div></div>
+      </td>
+      <td>
+        UI ${fmt(r.totalPagado,0)}
+        <div class="td-sub">≈ USD ${fmt(r.totalUSD,0)}</div>
+      </td>
+      <td>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--amber);">UI ${fmt(r.comUI,0)}</div>
+        <div class="td-sub" style="color:var(--amber);">tasa admin. c/IVA</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:3px;">UI ${fmt(r.segPorCuota*r.n,0)}</div>
+        <div class="td-sub">seguro total</div>
+      </td>
+      <td>${bg}</td>
+    </tr>`;
+  }).join('');
+
+  w.innerHTML=`<table>
+    <thead><tr>
+      <th>PLAZO</th>
+      <th>TASA REAL</th>
+      <th>DESGLOSE CUOTA MENSUAL</th>
+      <th>TOTAL A PAGAR</th>
+      <th>COSTO REAL (CLIENTE PAGA)</th>
+      <th>ELEGIB.</th>
+    </tr></thead>
+    <tbody>${tbody}</tbody>
+  </table>`;
+}
+
+// ── START ─────────────────────────────────
+renderChips();
+calcular();
+fetchCotiz();
+</script>
+</body>
+</html>
