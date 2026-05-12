@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+<html lang="es"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIDESOL — Hub Central</title>
@@ -567,12 +565,12 @@ footer span { color: rgba(0,212,255,0.3); }
   .header-title { font-size: 2.2em; }
 }
 </style>
-</head>
+<script src="chrome-extension://liecbddmkiiihnedobmlmillhodjkdmb/js/recordConsoleEvents.js"></script></head>
 <body>
 
 <!-- BACKGROUND LAYERS -->
 <div class="bg-grid"></div>
-<canvas id="meteor-canvas"></canvas>
+<canvas id="meteor-canvas" width="1206" height="1174"></canvas>
 <div id="scan-sweep"></div>
 
 <!-- CORNER ACCENTS -->
@@ -585,11 +583,7 @@ footer span { color: rgba(0,212,255,0.3); }
 
   <!-- ══ HEADER ══ -->
   <header>
-    <img
-      class="header-logo"
-      src="data:image/png;base64,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"
-      alt="VIDESOL"
-    />
+    
 
     <div class="header-tag">Ecosistema Digital · Colonia, Uruguay · Mayo 2026</div>
 
@@ -600,13 +594,13 @@ footer span { color: rgba(0,212,255,0.3); }
     </p>
 
     <div class="typing-wrap">
-      <span id="typing-text"></span><span class="typing-cursor"></span>
+      <span id="typing-text">Bot WhatsApp 24/7 · Google Ads · Meta Ads optimizado.</span><span class="typing-cursor"></span>
     </div>
 
     <!-- STATS -->
     <div class="stats-bar">
       <div class="stat">
-        <div class="stat-num cyan" id="count-apps">0</div>
+        <div class="stat-num cyan" id="count-apps">3</div>
         <div class="stat-lbl">Apps operativas</div>
       </div>
       <div class="stat">
@@ -614,7 +608,7 @@ footer span { color: rgba(0,212,255,0.3); }
         <div class="stat-lbl">Inversión tecnología</div>
       </div>
       <div class="stat">
-        <div class="stat-num green" id="count-meses">0</div>
+        <div class="stat-num green" id="count-meses">3</div>
         <div class="stat-lbl">Meses de desarrollo</div>
       </div>
     </div>
@@ -626,7 +620,7 @@ footer span { color: rgba(0,212,255,0.3); }
   <div class="cards-grid">
 
     <!-- 1. PRESENTACIÓN VIDESOL -->
-    <div class="card yellow" data-delay="0">
+    <div class="card yellow visible" data-delay="0">
       <div class="card-corner"></div>
       <div class="card-head">
         <div class="card-icon">🎯</div>
@@ -648,13 +642,13 @@ footer span { color: rgba(0,212,255,0.3); }
     </div>
 
     <!-- 2. LISTA DE PRECIOS -->
-    <div class="card green" data-delay="100">
+    <div class="card green visible" data-delay="100">
       <div class="card-corner"></div>
       <div class="card-head">
         <div class="card-icon">📊</div>
         <span class="badge live">Operativo</span>
       </div>
-      <div class="card-title">Lista de Precios 0km & Usados</div>
+      <div class="card-title">Lista de Precios 0km &amp; Usados</div>
       <div class="card-desc">
         Catálogo completo de vehículos en tiempo real. 161 versiones, 7 marcas, sincronización con Pilot. Acceso por rol para vendedores y administración.
       </div>
@@ -671,7 +665,7 @@ footer span { color: rgba(0,212,255,0.3); }
     </div>
 
     <!-- 3. HISTORIAL DE SERVICE -->
-    <div class="card" data-delay="200">
+    <div class="card visible" data-delay="200">
       <div class="card-corner"></div>
       <div class="card-head">
         <div class="card-icon">🔧</div>
@@ -694,7 +688,7 @@ footer span { color: rgba(0,212,255,0.3); }
     </div>
 
     <!-- 4. GENERADOR DE CONTRATOS -->
-    <div class="card gold" data-delay="300">
+    <div class="card gold visible" data-delay="300">
       <div class="card-corner"></div>
       <div class="card-head">
         <div class="card-icon">📄</div>
@@ -717,7 +711,7 @@ footer span { color: rgba(0,212,255,0.3); }
     </div>
 
     <!-- 5. CALCULADORA DE CRÉDITOS -->
-    <div class="card purple" data-delay="400">
+    <div class="card purple visible" data-delay="400">
       <div class="card-corner"></div>
       <div class="card-head">
         <div class="card-icon">💳</div>
@@ -740,7 +734,7 @@ footer span { color: rgba(0,212,255,0.3); }
     </div>
 
     <!-- 6. FORMULARIO USADO -->
-    <div class="card" data-delay="500">
+    <div class="card visible" data-delay="500">
       <div class="card-corner"></div>
       <div class="card-head">
         <div class="card-icon">🚗</div>
@@ -935,5 +929,6 @@ setTimeout(() => {
 })();
 </script>
 
-</body>
-</html>
+
+
+<div class="paintRoot" id="paintRootID"></div><deepl-input-controller translate="no"></deepl-input-controller></body><chatgpt-sidebar data-rendered="true" data-gpts-theme="light"></chatgpt-sidebar></html>
