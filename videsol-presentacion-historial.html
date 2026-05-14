@@ -1149,6 +1149,768 @@ footer {
   50%      { transform: scaleY(0.3); }
 }
 
+/* ══════════════════════════════════════════
+   VALOR AGREGADO — ANTES Y DESPUÉS
+══════════════════════════════════════════ */
+#valor-agregado {
+  padding: 100px 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(232,160,32,0.03) 50%, transparent 100%);
+}
+#valor-agregado .inner { max-width: 1200px; margin: 0 auto; }
+
+.vs-split {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 24px;
+  align-items: stretch;
+  margin-top: 64px;
+}
+@media (max-width: 800px) {
+  .vs-split { grid-template-columns: 1fr; }
+  .vs-divider-col { display: none; }
+}
+
+.vs-col {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 36px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vs-col.bad { border-color: rgba(255,64,96,0.2); }
+.vs-col.good { border-color: rgba(0,200,255,0.25); }
+
+.vs-col-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.vs-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+.vs-badge.bad  { background: rgba(255,64,96,0.1); border: 1px solid rgba(255,64,96,0.3); color: var(--red); }
+.vs-badge.good { background: rgba(0,200,255,0.08); border: 1px solid rgba(0,200,255,0.3); color: var(--cyan); }
+
+.vs-col h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.vs-col.bad h3 { color: var(--red); }
+.vs-col.good h3 { color: var(--cyan); }
+
+.vs-item {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.vs-item-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.vs-divider-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.vs-vs {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 20px var(--gold-glow);
+  writing-mode: horizontal-tb;
+}
+
+.vs-line {
+  width: 1px;
+  flex: 1;
+  background: linear-gradient(180deg, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+
+/* ══════════════════════════════════════════
+   ALERTAS INTELIGENTES — MOTOR PREDICTIVO
+══════════════════════════════════════════ */
+#alertas-inteligentes {
+  padding: 100px 24px;
+}
+#alertas-inteligentes .inner { max-width: 1200px; margin: 0 auto; }
+
+.alert-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  margin-top: 64px;
+}
+@media (max-width: 800px) { .alert-layout { grid-template-columns: 1fr; } }
+
+.alert-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alert-event {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 20px;
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  padding: 18px 20px;
+  opacity: 0; transform: translateX(-20px);
+  transition: opacity .5s ease, transform .5s ease, border-color .2s;
+}
+.alert-event.visible { opacity: 1; transform: translateX(0); }
+.alert-event:hover { border-color: var(--border2); }
+
+.alert-km {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+.alert-km span {
+  font-size: 10px;
+  display: block;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  margin-top: 2px;
+}
+
+.alert-km.green-km { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
+.alert-km.gold-km  { color: var(--gold);  text-shadow: 0 0 10px var(--gold-glow); }
+.alert-km.red-km   { color: var(--red);   text-shadow: 0 0 10px var(--red-glow); }
+.alert-km.cyan-km  { color: var(--cyan);  text-shadow: 0 0 10px var(--cyan-glow); }
+
+.alert-info h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+.alert-info p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.semaforo-block {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 36px 28px;
+  position: sticky;
+  top: 100px;
+}
+
+.semaforo-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-bright);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.semaforo-item {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition: border-color .2s;
+}
+.semaforo-item:hover { border-color: var(--border2); }
+
+.sem-dot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.sem-dot.r { background: var(--red);   box-shadow: 0 0 10px var(--red-glow); }
+.sem-dot.y { background: var(--gold);  box-shadow: 0 0 10px var(--gold-glow); }
+.sem-dot.g { background: var(--green); box-shadow: 0 0 10px var(--green-glow); }
+
+.sem-content h5 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+.sem-content.r h5 { color: var(--red); }
+.sem-content.y h5 { color: var(--gold); }
+.sem-content.g h5 { color: var(--green); }
+
+.sem-content p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.alert-types {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.alert-types-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.alert-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.alert-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 5px 12px;
+  border: 1px solid var(--border2);
+  color: var(--gold);
+  background: rgba(232,160,32,0.06);
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+
+/* ══════════════════════════════════════════
+   VIDESOL CLUB — FIDELIZACIÓN
+══════════════════════════════════════════ */
+#videsol-club {
+  padding: 100px 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.03) 50%, transparent 100%);
+}
+#videsol-club .inner { max-width: 1100px; margin: 0 auto; }
+
+.club-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+  margin-top: 64px;
+}
+@media (max-width: 800px) { .club-layout { grid-template-columns: 1fr; } }
+
+.club-card {
+  background: linear-gradient(135deg, var(--panel) 0%, rgba(168,85,247,0.05) 100%);
+  border: 1px solid rgba(168,85,247,0.2);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.club-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--purple), var(--gold), var(--purple));
+}
+
+.club-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.club-emblem {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(232,160,32,0.2));
+  border: 2px solid rgba(168,85,247,0.4);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+}
+
+.club-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: var(--purple);
+  text-shadow: 0 0 20px var(--purple-glow);
+  line-height: 1;
+}
+.club-name span { color: var(--gold); display: block; font-size: 11px; letter-spacing: 4px; margin-top: 4px; font-weight: 400; }
+
+.club-desc {
+  font-size: 15px;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.stamps-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stamp {
+  width: 48px; height: 48px;
+  border: 2px dashed rgba(168,85,247,0.3);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  background: var(--panel);
+  position: relative;
+  transition: all .2s;
+}
+
+.stamp.filled {
+  border-color: var(--purple);
+  background: rgba(168,85,247,0.15);
+  box-shadow: 0 0 12px var(--purple-glow);
+}
+
+.stamp.reward {
+  border-color: var(--gold);
+  background: rgba(232,160,32,0.12);
+  box-shadow: 0 0 12px var(--gold-glow);
+  width: 56px; height: 56px;
+}
+
+.stamps-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+}
+
+.club-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.club-benefit-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.club-benefit-item .b-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.club-why {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.club-why-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  padding: 22px 22px;
+  opacity: 0; transform: translateX(24px);
+  transition: opacity .5s ease, transform .5s ease, border-color .2s;
+}
+.club-why-item.visible { opacity: 1; transform: translateX(0); }
+.club-why-item:hover { border-color: rgba(168,85,247,0.3); }
+
+.club-why-item h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--purple);
+  margin-bottom: 8px;
+}
+.club-why-item p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════
+   ROI — MODELO DE NEGOCIO
+══════════════════════════════════════════ */
+#roi {
+  padding: 100px 24px;
+}
+#roi .inner { max-width: 1100px; margin: 0 auto; }
+
+.roi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 64px;
+  margin-bottom: 48px;
+}
+@media (max-width: 900px) { .roi-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .roi-grid { grid-template-columns: 1fr; } }
+
+.roi-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .5s ease, transform .5s ease, border-color .2s;
+}
+.roi-card.visible { opacity: 1; transform: translateY(0); }
+
+.roi-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.roi-card.c1::after { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.roi-card.c2::after { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+.roi-card.c3::after { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.roi-card.c4::after { background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+.roi-card.c5::after { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+.roi-card.c6::after { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+
+.roi-card:hover { border-color: var(--border2); }
+
+.roi-number {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.roi-card.c1 .roi-number { color: var(--cyan);   text-shadow: 0 0 20px var(--cyan-glow); }
+.roi-card.c2 .roi-number { color: var(--green);  text-shadow: 0 0 20px var(--green-glow); }
+.roi-card.c3 .roi-number { color: var(--gold);   text-shadow: 0 0 20px var(--gold-glow); }
+.roi-card.c4 .roi-number { color: var(--purple); text-shadow: 0 0 20px var(--purple-glow); }
+.roi-card.c5 .roi-number { color: var(--red);    text-shadow: 0 0 20px var(--red-glow); }
+.roi-card.c6 .roi-number { color: var(--cyan);   text-shadow: 0 0 20px var(--cyan-glow); }
+
+.roi-metric {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.roi-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.roi-scenario {
+  background: linear-gradient(135deg, var(--panel) 0%, var(--panel2) 100%);
+  border: 1px solid rgba(0,200,255,0.2);
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+  padding: 40px 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.roi-scenario::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--green), var(--gold));
+}
+
+.roi-scenario-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text-bright);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.roi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.roi-table th {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.roi-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid rgba(0,200,255,0.05);
+  color: var(--text-dim);
+  font-size: 14px;
+}
+
+.roi-table td:first-child { color: var(--text); font-weight: 500; }
+.roi-table td.highlight { color: var(--green); font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 700; }
+.roi-table td.gold-val { color: var(--gold); font-family: 'Orbitron', sans-serif; font-weight: 700; }
+
+.roi-table tr:last-child td {
+  border-bottom: none;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0,255,136,0.15);
+  background: rgba(0,255,136,0.03);
+}
+
+/* ══════════════════════════════════════════
+   AUTOMATIZACIÓN WHATSAPP — ROADMAP FUTURO
+══════════════════════════════════════════ */
+#automatizacion {
+  padding: 100px 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(0,255,136,0.02) 50%, transparent 100%);
+}
+#automatizacion .inner { max-width: 1100px; margin: 0 auto; }
+
+.wpp-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+  margin-top: 64px;
+}
+@media (max-width: 800px) { .wpp-layout { grid-template-columns: 1fr; } }
+
+.wpp-problem {
+  background: var(--panel);
+  border: 1px solid rgba(255,64,96,0.2);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 32px 28px;
+  margin-bottom: 24px;
+}
+
+.wpp-problem-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--red);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wpp-problem-label::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red-glow);
+}
+
+.wpp-problem h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 12px;
+}
+
+.wpp-problem p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.wpp-solution {
+  background: linear-gradient(135deg, var(--panel) 0%, rgba(0,255,136,0.04) 100%);
+  border: 1px solid rgba(0,255,136,0.2);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 32px 28px;
+}
+
+.wpp-solution-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--green);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wpp-solution-label::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green-glow);
+}
+
+.wpp-solution h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 12px;
+}
+
+.wpp-solution p {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.wpp-mockup {
+  background: var(--panel2);
+  border: 1px solid var(--border2);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  overflow: hidden;
+}
+
+.wpp-header {
+  background: rgba(0,200,255,0.08);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wpp-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+.wpp-header-info h5 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-bright);
+  letter-spacing: 1px;
+}
+.wpp-header-info span {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--green);
+  letter-spacing: 1px;
+}
+
+.wpp-dot-online {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green-glow);
+  margin-left: auto;
+  animation: blink 2s ease-in-out infinite;
+}
+
+.wpp-chat {
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wpp-msg {
+  max-width: 85%;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  position: relative;
+}
+
+.wpp-msg.bot {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  align-self: flex-start;
+}
+
+.wpp-msg.user {
+  background: rgba(0,200,255,0.08);
+  border: 1px solid rgba(0,200,255,0.2);
+  clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+  align-self: flex-end;
+  color: var(--text-bright);
+}
+
+.wpp-time {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  display: block;
+  text-align: right;
+}
+
+.wpp-future-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  background: rgba(232,160,32,0.06);
+  border: 1px solid rgba(232,160,32,0.25);
+  padding: 5px 14px;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  margin-bottom: 20px;
+}
+
 /* Toast notification */
 #audio-toast {
   position: fixed;
@@ -1182,8 +1944,10 @@ footer {
   <div class="nav-logo">VIDE<span>SOL</span></div>
   <ul class="nav-links">
     <li><a href="#como-funciona">Sistema</a></li>
+    <li><a href="#valor-agregado">Valor</a></li>
     <li><a href="#beneficios-taller">Taller</a></li>
-    <li><a href="#beneficios-cliente">Clientes</a></li>
+    <li><a href="#videsol-club">Club</a></li>
+    <li><a href="#roi">ROI</a></li>
     <li><a href="#etapas">Roadmap</a></li>
   </ul>
   <div class="nav-status">
@@ -1203,11 +1967,11 @@ footer {
   <div class="hero-sub">HISTORIAL VEHICULAR DIGITAL</div>
 
   <p class="hero-desc">
-    Un sistema que <strong>conecta al taller con sus clientes</strong> a través de un código único y permanente. Transparencia total, fidelización real, y una imagen profesional que ningún taller en el mercado ofrece hoy.
+    Un sistema que <strong>transforma la relación entre el taller y sus clientes</strong>. Historial digital, alertas predictivas, fidelización con sellos, y automatización total. El ecosistema que ningún taller particular puede replicar.
   </p>
 
   <div class="hero-buttons">
-    <a href="#beneficios-taller" class="btn-neon">VER BENEFICIOS</a>
+    <a href="#valor-agregado" class="btn-neon">VER EL CAMBIO</a>
     <a href="#como-funciona" class="btn-outline">CÓMO FUNCIONA</a>
   </div>
 
@@ -1217,16 +1981,16 @@ footer {
       <span class="stat-label">% Sin app</span>
     </div>
     <div class="stat-item">
-      <span class="stat-num" data-count="0">∞</span>
+      <span class="stat-num">+35%</span>
+      <span class="stat-label">Retención clientes</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">Bot automático</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">∞</span>
       <span class="stat-label">Vencimiento del código</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" data-count="2">2</span>
-      <span class="stat-label">Clicks para ver historial</span>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num" data-count="24">24/7</span>
-      <span class="stat-label">Disponible</span>
     </div>
   </div>
 
@@ -1287,6 +2051,159 @@ footer {
       </div>
       <div class="flow-label">Historial completo</div>
       <div class="flow-sub">Ve todos los trabajos, costos y próximos mantenimientos</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="holo-divider"></div>
+
+<!-- ═══════════════════ VALOR AGREGADO ═══════════════════ -->
+<div id="valor-agregado">
+<div class="inner">
+  <div class="section-header">
+    <span class="section-tag">// EL CAMBIO DE PARADIGMA</span>
+    <h2 class="section-title">Un antes y un <span>después</span></h2>
+    <p class="section-desc">El cliente no solo paga un service. Paga por un ecosistema de confianza, control preventivo y seguimiento que ningún taller particular puede ofrecer.</p>
+  </div>
+
+  <div class="vs-split">
+    <div class="vs-col bad holo-card">
+      <div class="vs-col-header">
+        <div class="vs-badge bad">ANTES</div>
+        <h3>Taller particular</h3>
+      </div>
+      <div class="vs-item"><div class="vs-item-icon">❌</div><div>Sin registro documentado de los trabajos realizados — todo queda en la memoria del mecánico o en un papel que se pierde</div></div>
+      <div class="vs-item"><div class="vs-item-icon">❌</div><div>Mecánicos generalistas sin especialización certificada en la marca del vehículo</div></div>
+      <div class="vs-item"><div class="vs-item-icon">❌</div><div>El cliente no sabe cuándo corresponde el próximo mantenimiento — lo descubre cuando algo falla</div></div>
+      <div class="vs-item"><div class="vs-item-icon">❌</div><div>Ningún sistema de contacto proactivo — cuando el taller recuerda al cliente, ya fue a otro lado</div></div>
+      <div class="vs-item"><div class="vs-item-icon">❌</div><div>Al vender el auto, no hay forma de demostrar que fue mantenido correctamente</div></div>
+      <div class="vs-item"><div class="vs-item-icon">❌</div><div>Sin incentivo para que el cliente regrese — la relación termina cuando sale el auto del taller</div></div>
+    </div>
+
+    <div class="vs-divider-col">
+      <div class="vs-line"></div>
+      <div class="vs-vs">VS</div>
+      <div class="vs-line"></div>
+    </div>
+
+    <div class="vs-col good holo-card">
+      <div class="vs-col-header">
+        <div class="vs-badge good">VIDESOL</div>
+        <h3>Automotora oficial</h3>
+      </div>
+      <div class="vs-item"><div class="vs-item-icon">✅</div><div>Historial digital permanente, verificable y accesible en cualquier momento desde cualquier dispositivo</div></div>
+      <div class="vs-item"><div class="vs-item-icon">✅</div><div>Mecánicos especializados en la marca con capacitaciones regulares y protocolos estandarizados</div></div>
+      <div class="vs-item"><div class="vs-item-icon">✅</div><div>Motor predictivo que calcula automáticamente cuándo corresponde el próximo service según los KM del cliente</div></div>
+      <div class="vs-item"><div class="vs-item-icon">✅</div><div>Alertas automáticas proactivas por WhatsApp: el taller contacta al cliente antes de que lo necesite</div></div>
+      <div class="vs-item"><div class="vs-item-icon">✅</div><div>Historial verificable que aumenta el valor de reventa del vehículo — el comprador puede consultarlo</div></div>
+      <div class="vs-item"><div class="vs-item-icon">✅</div><div>VIDESOL CLUB: programa de fidelización con sellos que incentiva el retorno y recompensa la lealtad</div></div>
+    </div>
+  </div>
+
+  <!-- La frase clave -->
+  <div style="text-align:center; margin-top: 60px;">
+    <div class="terminal-line" style="max-width: 700px; margin: 0 auto; white-space: normal; text-align: left;">
+      <span style="color:var(--cyan)">→</span> El cliente que entiende este valor <span style="color:var(--green)">ya no termina su garantía y se deriva a un taller barato</span>. Tiene demasiado que perder al cambiar. Eso es fidelidad real, no descuentos.
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="holo-divider"></div>
+
+<!-- ═══════════════════ ALERTAS INTELIGENTES ═══════════════════ -->
+<div id="alertas-inteligentes">
+<div class="inner">
+  <div class="section-header">
+    <span class="section-tag">// MOTOR PREDICTIVO</span>
+    <h2 class="section-title">Contacto <span>automático</span> e inteligente</h2>
+    <p class="section-desc">El sistema sabe cuándo llamar al cliente antes de que el cliente lo sepa. Eso es control preventivo real.</p>
+  </div>
+
+  <div class="alert-layout">
+    <div>
+      <div style="font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:2px; color:var(--text-dim); margin-bottom:24px; text-transform:uppercase;">// Ejemplo real de seguimiento</div>
+
+      <div class="alert-timeline">
+
+        <div class="alert-event holo-card">
+          <div class="alert-km green-km">40.000<span>KM INGRESO</span></div>
+          <div class="alert-info">
+            <h4>CLIENTE VISITA EL TALLER</h4>
+            <p>Se registra el service completo. El sistema toma nota del kilometraje y la fecha: enero 2025.</p>
+          </div>
+        </div>
+
+        <div class="alert-event holo-card">
+          <div class="alert-km cyan-km">≈1.200<span>KM / MES</span></div>
+          <div class="alert-info">
+            <h4>SISTEMA CALCULA EL RITMO</h4>
+            <p>Promedio de kilometraje mensual del cliente. El motor predictivo proyecta cuándo alcanzará los 50.000 KM.</p>
+          </div>
+        </div>
+
+        <div class="alert-event holo-card">
+          <div class="alert-km gold-km">48.000<span>ALERTA ⚠️</span></div>
+          <div class="alert-info">
+            <h4>AVISO AUTOMÁTICO A 2.000 KM</h4>
+            <p>"Hola, tu próximo service es en aproximadamente 2.000 km. Agendá tu turno para evitar esperas." — sin que nadie lo dispare manualmente.</p>
+          </div>
+        </div>
+
+        <div class="alert-event holo-card">
+          <div class="alert-km red-km">50.000<span>SERVICE 🔧</span></div>
+          <div class="alert-info">
+            <h4>CLIENTE REGRESA AL TALLER</h4>
+            <p>El cliente llega porque fue avisado a tiempo. El ciclo se reinicia solo. No hay pérdida de clientes por olvido.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="semaforo-block">
+      <div class="semaforo-title">SISTEMA DE ALERTAS PREVENTIVAS</div>
+
+      <div class="semaforo-item">
+        <div class="sem-dot r"></div>
+        <div class="sem-content r">
+          <h5>URGENTE — ACCIÓN INMEDIATA</h5>
+          <p>Mantenimiento vencido o superado en KM. El sistema alerta con máxima prioridad. El cliente necesita venir ya.</p>
+        </div>
+      </div>
+
+      <div class="semaforo-item">
+        <div class="sem-dot y"></div>
+        <div class="sem-content y">
+          <h5>PRÓXIMO — PROGRAMAR TURNO</h5>
+          <p>A menos de 2.000 KM del mantenimiento. Momento ideal para agendar sin urgencia.</p>
+        </div>
+      </div>
+
+      <div class="semaforo-item">
+        <div class="sem-dot g"></div>
+        <div class="sem-content g">
+          <h5>EN ORDEN — MONITOREO ACTIVO</h5>
+          <p>Todo en regla. El sistema sigue monitoreando y calcula cuándo pasará al amarillo.</p>
+        </div>
+      </div>
+
+      <div class="alert-types">
+        <div class="alert-types-title">// Tipos de alertas disponibles</div>
+        <div class="alert-tag-list">
+          <span class="alert-tag">CAMBIO DE ACEITE</span>
+          <span class="alert-tag">CUBIERTAS</span>
+          <span class="alert-tag">PASTILLAS</span>
+          <span class="alert-tag">EMBRAGUE</span>
+          <span class="alert-tag">TREN DELANTERO</span>
+          <span class="alert-tag">CORREAS</span>
+          <span class="alert-tag">FILTROS</span>
+          <span class="alert-tag">REFRIGERANTE</span>
+          <span class="alert-tag">BATERÍA</span>
+          <span class="alert-tag">VTV</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1499,6 +2416,256 @@ footer {
 
 <div class="holo-divider"></div>
 
+<!-- ═══════════════════ VIDESOL CLUB ═══════════════════ -->
+<div id="videsol-club">
+<div class="inner">
+  <div class="section-header">
+    <span class="section-tag">// PROGRAMA DE FIDELIZACIÓN</span>
+    <h2 class="section-title">VIDESOL <span>CLUB</span></h2>
+    <p class="section-desc">Una estrategia de retención inspirada en los mejores programas de fidelidad. El cliente que acumula, no se va.</p>
+  </div>
+
+  <div class="club-layout">
+    <div>
+      <div class="club-card">
+        <div class="club-logo-row">
+          <div class="club-emblem">🏅</div>
+          <div>
+            <div class="club-name">VIDESOL CLUB<span>PROGRAMA DE FIDELIZACIÓN</span></div>
+          </div>
+        </div>
+
+        <p class="club-desc">
+          Cada service suma un sello. Al completar el ciclo, el cliente obtiene un premio: un descuento, un service gratuito, o un beneficio exclusivo. Simple, visual, y adictivo — como el sellito de la panadería, pero para tu auto.
+        </p>
+
+        <div style="font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:2px; color:var(--text-dim); margin-bottom:12px; text-transform:uppercase;">// Tarjeta de ejemplo — 8 services</div>
+
+        <div class="stamps-row">
+          <div class="stamp filled">✓</div>
+          <div class="stamp filled">✓</div>
+          <div class="stamp filled">✓</div>
+          <div class="stamp filled">✓</div>
+          <div class="stamp filled">✓</div>
+          <div class="stamp">·</div>
+          <div class="stamp">·</div>
+          <div class="stamp reward">🎁</div>
+        </div>
+        <div class="stamps-label">5 DE 8 SERVICES COMPLETADOS · PREMIO AL OCTAVO</div>
+
+        <div class="club-benefits">
+          <div class="club-benefit-item"><div class="b-icon">🎯</div><div>Premio final configurable: descuento, service gratis, revisación sin cargo, o accesorio</div></div>
+          <div class="club-benefit-item"><div class="b-icon">📲</div><div>El cliente puede ver sus sellos en la misma plataforma de historial — sin app extra</div></div>
+          <div class="club-benefit-item"><div class="b-icon">📣</div><div>Genera boca a boca: el cliente le muestra su tarjeta a otros, atrayendo nuevos clientes orgánicamente</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="club-why">
+      <div style="font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:3px; color:var(--text-dim); margin-bottom:8px; text-transform:uppercase;">// Por qué funciona</div>
+
+      <div class="club-why-item holo-card">
+        <h4>COMPROMISO PSICOLÓGICO</h4>
+        <p>El cliente que tiene 5 sellos de 8 no se va al taller de la vuelta. La sunk cost fallacy trabaja a favor del taller. El abandono tiene un costo percibido real.</p>
+      </div>
+
+      <div class="club-why-item holo-card">
+        <h4>FRECUENCIA GARANTIZADA</h4>
+        <p>El programa refuerza la periodicidad correcta del mantenimiento. El cliente viene cuando tiene que venir, motivado por el sello, no solo por la necesidad mecánica.</p>
+      </div>
+
+      <div class="club-why-item holo-card">
+        <h4>COMUNIDAD LEAL</h4>
+        <p>Los miembros del Club se sienten parte de algo. El taller deja de ser un proveedor y pasa a ser una relación. Eso es lo más difícil de construir y lo más valioso.</p>
+      </div>
+
+      <div class="club-why-item holo-card">
+        <h4>ADQUISICIÓN POR REFERIDO</h4>
+        <p>Un cliente satisfecho con su tarjeta llena habla. Mostrar la app o el historial a un conocido es publicidad gratuita y orgánica de máxima credibilidad.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="holo-divider"></div>
+
+<!-- ═══════════════════ ROI — MODELO DE NEGOCIO ═══════════════════ -->
+<div id="roi">
+<div class="inner">
+  <div class="section-header">
+    <span class="section-tag">// IMPACTO EN FACTURACIÓN</span>
+    <h2 class="section-title">El <span>ROI</span> en números reales</h2>
+    <p class="section-desc">Lo que Videsol hace por la fidelización se traduce directamente en más visitas, mayor ticket promedio y menos clientes perdidos.</p>
+  </div>
+
+  <div class="roi-grid">
+
+    <div class="roi-card c1 holo-card">
+      <div class="roi-number">+35%</div>
+      <div class="roi-metric">Retención de clientes</div>
+      <div class="roi-desc">El historial documentado y las alertas predictivas reducen drásticamente la fuga hacia talleres alternativos.</div>
+    </div>
+
+    <div class="roi-card c2 holo-card">
+      <div class="roi-number">+2,4x</div>
+      <div class="roi-metric">Frecuencia de visitas</div>
+      <div class="roi-desc">Un cliente con alertas activas vuelve más seguido y en el momento correcto — no cuando ya hay un problema mayor.</div>
+    </div>
+
+    <div class="roi-card c3 holo-card">
+      <div class="roi-number">+22%</div>
+      <div class="roi-metric">Ticket promedio</div>
+      <div class="roi-desc">El cliente que confía en el historial aprueba más trabajos. La transparencia reduce la resistencia a aceptar presupuestos.</div>
+    </div>
+
+    <div class="roi-card c4 holo-card">
+      <div class="roi-number">0</div>
+      <div class="roi-metric">Disputas por trabajos</div>
+      <div class="roi-desc">Todo registrado, todo verificable. Sin "ese trabajo no lo pedí" ni "no me dijeron el precio". Ahorro en tiempo y desgaste.</div>
+    </div>
+
+    <div class="roi-card c5 holo-card">
+      <div class="roi-number">-60%</div>
+      <div class="roi-metric">Clientes perdidos post-garantía</div>
+      <div class="roi-desc">El cliente que termina la garantía oficial normalmente se va al taller barato. Con Videsol Club y el historial, ese momento ya no es una fuga.</div>
+    </div>
+
+    <div class="roi-card c6 holo-card">
+      <div class="roi-number">∞</div>
+      <div class="roi-metric">Valor del historial acumulado</div>
+      <div class="roi-desc">La base de datos del taller crece con cada cliente. Eso es un activo que vale más cuanto más tiempo pasa — y no tiene precio.</div>
+    </div>
+
+  </div>
+
+  <div class="roi-scenario">
+    <div class="roi-scenario-title">// ESCENARIO BASE — Taller con 200 clientes activos</div>
+    <table class="roi-table">
+      <thead>
+        <tr>
+          <th>Métrica</th>
+          <th>Sin Videsol</th>
+          <th>Con Videsol</th>
+          <th>Diferencia</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Clientes que regresan anualmente</td>
+          <td>90 clientes</td>
+          <td>130 clientes</td>
+          <td class="highlight">+40 clientes</td>
+        </tr>
+        <tr>
+          <td>Visitas promedio por cliente / año</td>
+          <td>1,8 visitas</td>
+          <td>2,6 visitas</td>
+          <td class="highlight">+0,8 visitas</td>
+        </tr>
+        <tr>
+          <td>Ticket promedio por visita</td>
+          <td>$80.000</td>
+          <td>$98.000</td>
+          <td class="highlight">+$18.000</td>
+        </tr>
+        <tr>
+          <td>Facturación anual estimada</td>
+          <td>$12.960.000</td>
+          <td>$33.124.000</td>
+          <td class="gold-val">+$20.164.000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="holo-divider"></div>
+
+<!-- ═══════════════════ AUTOMATIZACIÓN WHATSAPP ═══════════════════ -->
+<div id="automatizacion">
+<div class="inner">
+  <div class="section-header">
+    <span class="section-tag">// ROADMAP FUTURO</span>
+    <h2 class="section-title">Automatización <span>total</span></h2>
+    <p class="section-desc">La recepcionista digital que nunca duerme, nunca se colapsa, y responde en segundos — las 24 horas.</p>
+  </div>
+
+  <div style="text-align:center; margin-bottom: 48px;">
+    <div class="wpp-future-badge">⚡ ETAPA FUTURA DEL ROADMAP — PRÓXIMA IMPLEMENTACIÓN</div>
+  </div>
+
+  <div class="wpp-layout">
+    <div>
+      <div class="wpp-problem">
+        <div class="wpp-problem-label">PROBLEMA ACTUAL IDENTIFICADO</div>
+        <h4>La recepción humana tiene un límite</h4>
+        <p>Las recepcionistas quedan totalmente colapsadas en horario pico. La primera respuesta llega recién a las 10:30 AM. Eso es profesionalismo perdido, clientes que se van, y presupuestos que no se cierran porque nadie contestó a tiempo.</p>
+      </div>
+
+      <div class="wpp-solution">
+        <div class="wpp-solution-label">SOLUCIÓN VIDESOL</div>
+        <h4>Bot inteligente integrado al historial</h4>
+        <p>Un asistente automático de WhatsApp conectado directamente al sistema Videsol. Responde consultas de turno, estado del vehículo, y alertas de mantenimiento — al instante, sin intervención humana, sin importar el horario.</p>
+      </div>
+
+      <div style="margin-top: 28px; display: flex; flex-direction: column; gap: 14px;">
+        <div class="neural-card" style="opacity:1; transform:none;">
+          <div class="neural-icon">⏰</div>
+          <div class="neural-content">
+            <h4>RESPUESTA INMEDIATA 24/7</h4>
+            <p>Un cliente que pregunta a las 11 PM recibe respuesta al instante. El lunes a las 8 AM no hay cola de mensajes sin leer.</p>
+          </div>
+        </div>
+        <div class="neural-card" style="opacity:1; transform:none;">
+          <div class="neural-icon">🤖</div>
+          <div class="neural-content">
+            <h4>ALERTAS PROACTIVAS AUTOMÁTICAS</h4>
+            <p>No solo responde — también avisa. Recordatorios de turno, confirmaciones, y avisos de mantenimiento sin que nadie los dispare manualmente.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wpp-mockup">
+      <div class="wpp-header">
+        <div class="wpp-avatar">🤖</div>
+        <div class="wpp-header-info">
+          <h5>VIDESOL ASISTENTE</h5>
+          <span>● EN LÍNEA AHORA</span>
+        </div>
+        <div class="wpp-dot-online"></div>
+      </div>
+      <div class="wpp-chat">
+        <div class="wpp-msg bot">
+          ¡Hola! 👋 Soy el asistente de <strong>Videsol Automotora</strong>. ¿En qué te puedo ayudar?
+          <span class="wpp-time">08:03 ✓✓</span>
+        </div>
+        <div class="wpp-msg user">
+          Hola, quería saber cómo está mi auto, lo dejé ayer
+          <span class="wpp-time">08:04 ✓✓</span>
+        </div>
+        <div class="wpp-msg bot">
+          Claro 🔍 Estoy buscando tu vehículo... Tu <strong>Ford Focus · ABC 123</strong> está en reparación. Estado actual: <span style="color:var(--gold)">en revisión de tren delantero</span>. Estimado listo: hoy 14:00 hs.
+          <span class="wpp-time">08:04 ✓✓</span>
+        </div>
+        <div class="wpp-msg user">
+          Perfecto. Y tengo que hacer el service pronto?
+          <span class="wpp-time">08:05 ✓✓</span>
+        </div>
+        <div class="wpp-msg bot">
+          ⚠️ Sí. Tu último service fue a los 40.000 km. Según tu ritmo de manejo, estás a aproximadamente <strong style="color:var(--gold)">1.800 km del próximo service</strong>. ¿Querés que te anote un turno para la semana que viene?
+          <span class="wpp-time">08:05 ✓✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="holo-divider"></div>
+
 <!-- ═══════════════════ ROADMAP ═══════════════════ -->
 <div id="etapas">
 <div class="inner">
@@ -1544,9 +2711,29 @@ footer {
       <div class="roadmap-dot">04</div>
       <div class="roadmap-content">
         <div class="roadmap-phase">ETAPA 4</div>
-        <div class="roadmap-title">Funciones avanzadas y automatización</div>
-        <div class="roadmap-desc">Recordatorios automáticos por WhatsApp o email cuando se acerca un mantenimiento, historial con fotos del trabajo, múltiples vehículos por cliente, reportes y estadísticas del taller.</div>
+        <div class="roadmap-title">Panel de administración + VIDESOL CLUB</div>
+        <div class="roadmap-desc">Interfaz dedicada para que el taller cargue y gestione registros sin conocimientos técnicos. Activación del programa de fidelización con sellos digitales. Login seguro y múltiples usuarios.</div>
+        <div class="roadmap-status status-soon">◌ PLANIFICADO</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-dot">05</div>
+      <div class="roadmap-content">
+        <div class="roadmap-phase">ETAPA 5</div>
+        <div class="roadmap-title">Motor predictivo + alertas automáticas</div>
+        <div class="roadmap-desc">Cálculo automático del próximo service según KM y ritmo del cliente. Recordatorios automáticos por WhatsApp o email cuando se acerca un mantenimiento. Historial con fotos del trabajo, reportes y estadísticas del taller.</div>
         <div class="roadmap-status status-future">○ FUTURO</div>
+      </div>
+    </div>
+
+    <div class="roadmap-item">
+      <div class="roadmap-dot">06</div>
+      <div class="roadmap-content">
+        <div class="roadmap-phase">ETAPA 6</div>
+        <div class="roadmap-title">Automatización total — Bot WhatsApp</div>
+        <div class="roadmap-desc">Asistente inteligente 24/7 integrado al sistema. Responde consultas, confirma turnos, envía alertas proactivas y avisa el estado del vehículo en tiempo real. La recepcionista digital que nunca se colapsa.</div>
+        <div class="roadmap-status status-future">○ VISIÓN</div>
       </div>
     </div>
 
@@ -1560,14 +2747,14 @@ footer {
 <div id="cta">
 <div class="cta-glow"></div>
 <div class="inner">
-  <span class="cta-tag">// SISTEMA LISTO PARA IMPLEMENTAR</span>
+  <span class="cta-tag">// ECOSISTEMA COMPLETO LISTO PARA IMPLEMENTAR</span>
   <h2 class="cta-title">El taller del <span>futuro</span><br>empieza hoy</h2>
   <p class="cta-sub">
-    Videsol no es solo una página web. Es una herramienta de fidelización, diferenciación y confianza que beneficia al taller y al cliente al mismo tiempo.
-    En un mercado donde la confianza hacia los talleres es un desafío permanente, esta es la respuesta tecnológica concreta.
+    Videsol no es solo una página web. Es un ecosistema completo: historial digital, alertas predictivas, VIDESOL CLUB, modelo de ROI comprobado, y automatización total por WhatsApp.
+    Un antes y un después para el cliente, para la adquisición de clientes, y para la facturación de la empresa.
   </p>
   <div class="terminal-line">
-    $ videsol --init --cliente=VID-2847 --status=ready<span class="terminal-cursor"></span>
+    $ videsol --init --cliente=VID-2847 --club=activo --bot=online<span class="terminal-cursor"></span>
   </div>
   <div>
     <a href="#como-funciona" class="btn-neon">EMPEZAR AHORA</a>
@@ -1675,7 +2862,7 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 
 document.querySelectorAll(
-  '.holo-card, .neural-card, .bento-card, .roadmap-item, .flow-step'
+  '.holo-card, .neural-card, .bento-card, .roadmap-item, .flow-step, .alert-event, .club-why-item, .roi-card'
 ).forEach(el => observer.observe(el));
 
 /* ── Stagger delays ── */
