@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Documentos — Videsol</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:   #14b8a6;
+  --cyan:   #06b6d4;
+  --green:  #10b981;
+  --purple: #8b5cf6;
+  --amber:  #f59e0b;
+  --red:    #ef4444;
+  --bg:     #0c0c14;
+  --border: rgba(255,255,255,0.07);
+  --text:   #f1f5f9;
+  --muted:  #64748b;
+  --sub:    #94a3b8;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── AURORA ── */
+.aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.aurora::before {
+  content: '';
+  position: absolute; top: -40%; left: -20%;
+  width: 70%; height: 70%;
+  background: radial-gradient(ellipse, rgba(20,184,166,0.12) 0%, transparent 70%);
+  animation: drift1 20s ease-in-out infinite alternate;
+}
+.aurora::after {
+  content: '';
+  position: absolute; bottom: -30%; right: -10%;
+  width: 60%; height: 60%;
+  background: radial-gradient(ellipse, rgba(139,92,246,0.1) 0%, transparent 70%);
+  animation: drift2 25s ease-in-out infinite alternate;
+}
+@keyframes drift1 { from{transform:translate(0,0) scale(1)} to{transform:translate(4%,6%) scale(1.08)} }
+@keyframes drift2 { from{transform:translate(0,0) scale(1)} to{transform:translate(-5%,-4%) scale(1.06)} }
+
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ── LAYOUT ── */
+.content { position: relative; z-index: 1; }
+.container { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  padding: 14px 28px;
+  background: rgba(12,12,20,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em;
+  background: linear-gradient(135deg, var(--teal), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+.nav-tag {
+  font-size: 0.7rem; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 20px;
+  padding: 4px 12px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* ── SECTIONS ── */
+.section { padding: 80px 0; }
+.section + .section { border-top: 1px solid var(--border); }
+.section-hero { padding: 110px 0 80px; text-align: center; }
+
+/* ── LABELS & HEADINGS ── */
+.label {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.15em;
+  font-weight: 700; color: var(--teal); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.label::before { content:''; display:inline-block; width:18px; height:1px; background:var(--teal); }
+
+h1 { font-size: clamp(2.4rem,5.5vw,4rem); font-weight:800; line-height:1.08; letter-spacing:-0.03em; }
+h2 { font-size: clamp(1.7rem,3vw,2.4rem); font-weight:800; line-height:1.1; letter-spacing:-0.025em; margin-bottom:10px; }
+h3 { font-size: 1rem; font-weight:700; margin-bottom:6px; }
+h4 { font-size: 0.92rem; font-weight:700; margin-bottom:4px; }
+
+.gradient-teal  { background:linear-gradient(135deg,#5eead4,#06b6d4); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.gradient-red   { background:linear-gradient(135deg,#f87171,#fb923c); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.gradient-green { background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+
+.lead { font-size:1.05rem; color:var(--sub); line-height:1.65; max-width:620px; }
+.small { font-size:0.88rem; color:var(--sub); line-height:1.65; }
+
+/* ── BADGE ── */
+.badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.3);
+  border-radius:30px; padding:6px 16px;
+  font-size:0.76rem; color:#5eead4; letter-spacing:0.06em;
+  text-transform:uppercase; margin-bottom:28px;
+}
+.badge .pulse { width:6px; height:6px; border-radius:50%; background:var(--teal); animation:pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.5)} }
+
+/* ── CARDS ── */
+.card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:14px; padding:22px 24px;
+  transition:border-color 0.3s;
+}
+.card:hover { border-color:rgba(20,184,166,0.2); }
+
+/* ── GRIDS ── */
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.grid-5 { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+@media(max-width:900px) { .grid-3,.grid-4,.grid-5 { grid-template-columns:1fr 1fr; } }
+@media(max-width:600px) { .grid-2,.grid-3,.grid-4,.grid-5 { grid-template-columns:1fr; } }
+
+/* ── PROBLEM LIST ── */
+.prob-list { list-style:none; display:flex; flex-direction:column; gap:11px; }
+.prob-list li { display:flex; gap:12px; align-items:flex-start; font-size:0.88rem; color:var(--sub); line-height:1.5; }
+.prob-list li .ico { flex-shrink:0; margin-top:2px; }
+
+/* ── COMPARE ── */
+.compare-col { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.compare-col.bad  { border-color:rgba(239,68,68,0.18); }
+.compare-col.good { border-color:rgba(20,184,166,0.2); }
+.compare-header { padding:12px 18px; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; }
+.compare-header.bad  { background:rgba(239,68,68,0.07); color:#f87171; border-bottom:1px solid rgba(239,68,68,0.12); }
+.compare-header.good { background:rgba(20,184,166,0.07); color:#5eead4; border-bottom:1px solid rgba(20,184,166,0.12); }
+.compare-body { list-style:none; padding:16px 18px; display:flex; flex-direction:column; gap:10px; }
+.compare-body li { font-size:0.84rem; color:var(--sub); display:flex; gap:9px; align-items:flex-start; }
+
+/* ── DOC ITEMS ── */
+.doc-item {
+  display:flex; align-items:center; gap:14px;
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:10px; padding:13px 16px; margin-bottom:9px;
+  transition:border-color 0.25s;
+}
+.doc-item:hover { border-color:rgba(20,184,166,0.3); }
+.doc-icon { width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+.doc-name { font-size:0.9rem; font-weight:600; }
+.doc-desc { font-size:0.78rem; color:var(--sub); margin-top:2px; }
+.tag { margin-left:auto; padding:3px 10px; border-radius:20px; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.08em; font-weight:700; flex-shrink:0; }
+.tag-live { background:rgba(16,185,129,0.12); color:#34d399; border:1px solid rgba(16,185,129,0.2); }
+.tag-soon { background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); }
+
+/* ── STAT BOX ── */
+.stat-box { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+.stat-num { font-size:1.8rem; font-weight:800; display:block; line-height:1; margin-bottom:5px; }
+.stat-lbl { font-size:0.72rem; color:var(--sub); text-transform:uppercase; letter-spacing:0.07em; }
+
+/* ── ROADMAP ── */
+.rm-item { display:flex; align-items:flex-start; gap:14px; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:10px; padding:14px 18px; margin-bottom:9px; }
+.rm-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.rm-soon   { background:var(--amber); box-shadow:0 0 10px rgba(245,158,11,.5); }
+.rm-mid    { background:var(--teal);  box-shadow:0 0 10px rgba(20,184,166,.5); }
+.rm-future { background:var(--purple);box-shadow:0 0 10px rgba(139,92,246,.5); }
+.rm-text p { font-size:0.82rem; color:var(--sub); }
+
+/* ── TIME BREAKDOWN TABLE ── */
+.time-table {
+  background:rgba(20,184,166,0.05); border:1px solid rgba(20,184,166,0.2);
+  border-radius:12px; padding:16px 20px; margin-top:14px;
+}
+.time-table .tt-label { font-size:0.68rem; text-transform:uppercase; letter-spacing:.12em; color:var(--teal); font-weight:700; margin-bottom:10px; }
+.time-row { display:flex; justify-content:space-between; font-size:0.84rem; padding:5px 0; }
+.time-row + .time-row { border-top:1px solid rgba(255,255,255,0.05); }
+.time-row .tl { color:var(--sub); }
+.time-row .tv { font-weight:700; }
+.time-total { display:flex; justify-content:space-between; font-size:0.92rem; font-weight:800; padding-top:10px; margin-top:6px; border-top:1px solid rgba(20,184,166,0.3); }
+
+/* ── DIVIDER ── */
+.divider { height:1px; background:var(--border); }
+
+/* ── BENEFIT ICON ── */
+.b-icon { font-size:1.3rem; margin-bottom:8px; display:block; }
+
+/* ── ROW LINE ── */
+.row-line { display:flex; justify-content:space-between; font-size:0.83rem; padding:6px 0; border-bottom:1px solid var(--border); }
+.row-line:last-of-type { border-bottom:none; }
+.row-total { display:flex; justify-content:space-between; font-size:0.92rem; font-weight:800; padding-top:8px; margin-top:4px; border-top:1px solid rgba(255,255,255,.12); }
+
+/* ── FADE UP ── */
+.fade-up { opacity:0; transform:translateY(22px); transition:opacity 0.55s ease, transform 0.55s ease; }
+.fade-up.visible { opacity:1; transform:translateY(0); }
+
+/* ── FINAL BOX ── */
+.final-item { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:center; }
+.fi-ico { font-size:1.5rem; margin-bottom:8px; display:block; }
+</style>
+</head>
+<body>
+
+<div class="aurora"></div>
+<div class="grid-bg"></div>
+
+<div class="content">
+
+<!-- ── NAV ── -->
+<nav>
+  <span class="nav-logo">Videsol</span>
+  <span class="nav-tag">Generador de Documentos</span>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="section-hero">
+  <div class="container" style="display:flex;flex-direction:column;align-items:center;">
+    <div class="badge fade-up"><span class="pulse"></span>Herramienta interna · Operativo</div>
+    <h1 class="fade-up">Generador de<br><span class="gradient-teal">Documentos</span></h1>
+    <p class="lead fade-up" style="text-align:center;margin-top:16px;">
+      Del formulario en blanco a todos los documentos de la venta listos para imprimir —<br>en menos de 5 minutos.
+    </p>
+    <div class="fade-up" style="display:flex;gap:36px;flex-wrap:wrap;justify-content:center;margin-top:40px;">
+      <div style="text-align:center;">
+        <div style="font-size:2rem;font-weight:800;color:var(--teal);">5 min</div>
+        <div style="font-size:0.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;">Por venta completa</div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2rem;font-weight:800;color:var(--teal);">4</div>
+        <div style="font-size:0.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;">Documentos generados</div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2rem;font-weight:800;color:var(--teal);">0</div>
+        <div style="font-size:0.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;">Errores de formato</div>
+      </div>
+      <div style="width:1px;background:var(--border);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2rem;font-weight:800;color:var(--teal);">-83%</div>
+        <div style="font-size:0.72rem;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;">Tiempo por venta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     EL PROBLEMA → ANTES vs AHORA (unificado)
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">El problema · Comparativa</div>
+    <h2 class="fade-up">Antes <span style="color:var(--muted);font-weight:400;">vs</span> <span class="gradient-teal">ahora</span></h2>
+    <p class="small fade-up" style="margin-bottom:28px;max-width:640px;">Cada venta requería crear los 4 documentos de forma manual, uno por uno. Eso tenía un costo real en tiempo y calidad.</p>
+
+    <div class="grid-2 fade-up">
+      <div class="compare-col bad">
+        <div class="compare-header bad">✕ &nbsp;Proceso manual — antes</div>
+        <ul class="compare-body">
+          <li><span>✏️</span>Búsqueda de cada plantilla por separado</li>
+          <li><span>⌨️</span>Tipeo manual de datos del cliente y vehículo en cada documento</li>
+          <li><span>⏳</span>~5 min por documento × 4 documentos = 20–30 min por venta, más correcciones e impresora</li>
+          <li><span>❓</span>Sin validación — campos vacíos que se detectan tarde o nunca</li>
+          <li><span>😰</span>Cada vendedor con su propio criterio — resultados inconsistentes</li>
+          <li><span>📁</span>Sin sistema de archivo estandarizado — cada vendedor guarda a su criterio</li>
+          <li><span>🏃</span>Laura debía perseguir al vendedor para completar datos faltantes</li>
+        </ul>
+        <div style="background:rgba(239,68,68,0.07);padding:14px 18px;border-top:1px solid rgba(239,68,68,0.12);">
+          <div style="font-size:0.68rem;color:#f87171;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:6px;">Impacto en 30 ventas mensuales</div>
+          <div style="font-size:0.85rem;color:var(--sub);">30 ventas × ~30 min = <strong style="color:#f87171;">900 min = 15 horas</strong> perdidas solo en documentación</div>
+        </div>
+      </div>
+
+      <div class="compare-col good">
+        <div class="compare-header good">✓ &nbsp;Con el generador — ahora</div>
+        <ul class="compare-body">
+          <li><span>🖥️</span>El vendedor abre el sistema — todo en un solo lugar</li>
+          <li><span>📝</span>Carga los datos del cliente y vehículo <strong style="color:var(--text);">una sola vez</strong></li>
+          <li><span>⚡</span>El sistema genera los 4 documentos de la venta al instante</li>
+          <li><span>🛡️</span>Validación autom para toda la documentación del mesática — sin campos vacíos posibles</li>
+          <li><span>🎨</span>Todos los vendedores producen el mismo documento impecable</li>
+          <li><span>📁</span>Carpeta digital por cliente — todos sus documentos agrupados, accesibles en segundos</li>
+          <li><span>✅</span>Laura recibe la carpeta completa y lista — solo imprime y arma el sobre</li>
+        </ul>
+        <div style="background:rgba(20,184,166,0.07);padding:14px 18px;border-top:1px solid rgba(20,184,166,0.12);">
+          <div style="font-size:0.68rem;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:6px;">Impacto en 30 ventas mensuales</div>
+          <div style="font-size:0.85rem;color:var(--sub);">30 ventas × ~5 min = <strong style="color:var(--teal);">150 min = 2.5 horas</strong> para toda la documentación del mes, sin contabilizar tiempo de Laura</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-4 fade-up" style="margin-top:16px;">
+      <div class="stat-box"><span class="stat-num" style="color:var(--teal);">-83%</span><span class="stat-lbl">Tiempo por venta</span></div>
+      <div class="stat-box"><span class="stat-num" style="color:var(--teal);">+12.5 hs</span><span class="stat-lbl">Recuperadas cada 30 ventas</span></div>
+      <div class="stat-box"><span class="stat-num" style="color:var(--teal);">100%</span><span class="stat-lbl">Documentos completos y válidos</span></div>
+      <div class="stat-box"><span class="stat-num" style="color:var(--teal);">0</span><span class="stat-lbl">Errores de formato posibles</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     LA SOLUCIÓN — BENEFICIOS
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">Lo que gana el equipo</div>
+    <h2 class="fade-up">Un sistema que trabaja<br><span class="gradient-teal">por el vendedor</span></h2>
+    <p class="small fade-up" style="margin-bottom:28px;max-width:640px;">El vendedor ingresa los datos una vez — el sistema los organiza, los inserta en cada template y entrega todos los documentos listos para imprimir o firmar.</p>
+
+    <div class="grid-3 fade-up">
+      <div class="card"><span class="b-icon">⚡</span><h3>Velocidad real</h3><p class="small">De 30 min a 5 min por venta. El vendedor llena el formulario una sola vez y el sistema genera todos los documentos al instante.</p></div>
+      <div class="card"><span class="b-icon">✅</span><h3>Cero errores de formato</h3><p class="small">El documento siempre sale con todos los campos correctos. No es posible entregar un contrato con datos incompletos.</p></div>
+      <div class="card"><span class="b-icon">🎨</span><h3>Imagen profesional uniforme</h3><p class="small">Todos los documentos con el mismo formato, logo y estilo — sin importar qué vendedor lo haga o en qué momento.</p></div>
+      <div class="card"><span class="b-icon">📁</span><h3>Carpeta digital por cliente</h3><p class="small">Cada venta genera una carpeta con todos los documentos de ese cliente. Si mañana necesitás algo, vas a esa carpeta y está todo.</p></div>
+      <div class="card"><span class="b-icon">🧠</span><h3>Sin conocimientos técnicos</h3><p class="small">Interfaz simple. Si sabés usar WhatsApp, sabés usar el generador. No requiere capacitación especial.</p></div>
+      <div class="card"><span class="b-icon">⚖️</span><h3>Seguridad legal</h3><p class="small">Campos obligatorios siempre presentes. El sistema no deja avanzar si falta información crítica.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     DOCUMENTOS OPERATIVOS
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">Disponibles hoy</div>
+    <h2 class="fade-up">Documentos <span class="gradient-teal">operativos</span></h2>
+    <p class="small fade-up" style="margin-bottom:28px;max-width:620px;">Estos documentos ya están integrados al sistema y pueden generarse en este momento. El vendedor carga los datos una sola vez y el sistema los produce todos.</p>
+
+    <div class="grid-2 fade-up" style="align-items:start;">
+
+      <div>
+        <div class="doc-item">
+          <div class="doc-icon" style="background:rgba(20,184,166,0.12);">📄</div>
+          <div><div class="doc-name">Contrato de Compraventa</div><div class="doc-desc">Para vehículos 0km y usados entre concesionaria y cliente particular</div></div>
+          <span class="tag tag-live">Activo</span>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon" style="background:rgba(20,184,166,0.12);">🤝</div>
+          <div><div class="doc-name">Contrato a Revendedor</div><div class="doc-desc">Operaciones entre concesionaria y revendedores habilitados</div></div>
+          <span class="tag tag-live">Activo</span>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon" style="background:rgba(20,184,166,0.12);">🔄</div>
+          <div><div class="doc-name">Contrato de Consignación</div><div class="doc-desc">Vehículos entregados a la agencia para venta en consignación</div></div>
+          <span class="tag tag-live">Activo</span>
+        </div>
+        <div class="doc-item">
+          <div class="doc-icon" style="background:rgba(20,184,166,0.12);">📦</div>
+          <div><div class="doc-name">Entrega de Carpeta de Documentación</div><div class="doc-desc">Certifica la entrega completa de documentación del vehículo al cliente</div></div>
+          <span class="tag tag-live">Activo</span>
+        </div>
+
+        <!-- TIME BREAKDOWN -->
+        <div class="time-table">
+          <div class="tt-label">⏱ Tiempo real — sin sistema vs con sistema</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-size:0.7rem;color:#f87171;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">✕ Sin sistema · por venta</div>
+              <div class="time-row"><span class="tl">Contrato Compraventa</span><span class="tv" style="color:#f87171;">~5 min</span></div>
+              <div class="time-row"><span class="tl">Contrato Revendedor</span><span class="tv" style="color:#f87171;">~5 min</span></div>
+              <div class="time-row"><span class="tl">Contrato Consignación</span><span class="tv" style="color:#f87171;">~5 min</span></div>
+              <div class="time-row"><span class="tl">Entrega de Carpeta</span><span class="tv" style="color:#f87171;">~5 min</span></div>
+              <div class="time-row"><span class="tl">Correcciones / impresora</span><span class="tv" style="color:#f87171;">~10 min</span></div>
+              <div class="time-total"><span>Total por venta</span><span style="color:#f87171;">~30 min</span></div>
+            </div>
+            <div>
+              <div style="font-size:0.7rem;color:var(--teal);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;">✓ Con sistema · por venta</div>
+              <div class="time-row"><span class="tl">Ingresar datos (1 vez)</span><span class="tv" style="color:var(--teal);">~3 min</span></div>
+              <div class="time-row"><span class="tl">Contrato Compraventa</span><span class="tv" style="color:var(--teal);">automático</span></div>
+              <div class="time-row"><span class="tl">Contrato Revendedor</span><span class="tv" style="color:var(--teal);">automático</span></div>
+              <div class="time-row"><span class="tl">Contrato Consignación</span><span class="tv" style="color:var(--teal);">automático</span></div>
+              <div class="time-row"><span class="tl">Entrega de Carpeta</span><span class="tv" style="color:var(--teal);">automático</span></div>
+              <div class="time-total"><span>Total por venta</span><span style="color:var(--teal);">~5 min</span></div>
+            </div>
+          </div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(20,184,166,0.2);display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="font-size:0.83rem;color:var(--sub);">30 ventas sin sistema: <strong style="color:#f87171;">900 min = 15 horas</strong></div>
+            <div style="font-size:0.83rem;color:var(--sub);">30 ventas con sistema: <strong style="color:var(--teal);">150 min = 2.5 horas</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="border-color:rgba(20,184,166,0.2);background:rgba(20,184,166,0.04);">
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:700;margin-bottom:12px;">¿Cómo funciona en la práctica?</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;font-size:0.86rem;color:var(--sub);">
+              <span style="color:var(--teal);font-weight:800;flex-shrink:0;width:22px;">01</span>El vendedor abre el sistema e ingresa los datos del cliente y el vehículo en el formulario guiado — <strong style="color:var(--text);">una sola vez.</strong>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;font-size:0.86rem;color:var(--sub);">
+              <span style="color:var(--teal);font-weight:800;flex-shrink:0;width:22px;">02</span>El sistema detecta automáticamente qué documentos corresponden a ese tipo de operación y modelo de vehículo.
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;font-size:0.86rem;color:var(--sub);">
+              <span style="color:var(--teal);font-weight:800;flex-shrink:0;width:22px;">03</span>Todos los documentos se generan al instante, con los datos correctos insertados en cada template.
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;font-size:0.86rem;color:var(--sub);">
+              <span style="color:var(--teal);font-weight:800;flex-shrink:0;width:22px;">04</span>Se imprime directamente — o se guarda en la <strong style="color:var(--text);">carpeta digital del cliente.</strong> Listo para firmar.
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:700;margin-bottom:8px;">Archivo digital por cliente</div>
+          <div style="font-size:0.84rem;color:var(--sub);">Cada venta genera una carpeta con todos los documentos de ese cliente. Mañana necesitás el contrato de Juan Pérez — vas a su carpeta y está todo ahí, sin buscar en papeles ni preguntar al vendedor.</div>
+        </div>
+
+        <div class="card" style="margin-top:12px;">
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:700;margin-bottom:8px;">Nota técnica</div>
+          <div style="font-size:0.84rem;color:var(--sub);">El sistema corre en la red interna de la agencia. No requiere internet ni servidores externos — todo el proceso es local y privado.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     LAURA — LIBERACIÓN DE GESTIÓN
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">Impacto en administración</div>
+    <h2 class="fade-up">Laura recupera<br><span class="gradient-teal">tiempo real</span></h2>
+    <p class="small fade-up" style="margin-bottom:28px;max-width:680px;">Actualmente Laura gestiona las entregas de 0km mientras confecciona toda la documentación a mano. Cuando se acumulan entregas, ese proceso se convierte en un cuello de botella crítico.</p>
+
+    <div class="grid-2 fade-up" style="align-items:start;">
+      <div>
+        <div style="font-size:0.72rem;color:#f87171;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:10px;">📌 Lo que Laura hacía manualmente</div>
+        <ul class="prob-list">
+          <li><span class="ico">📄</span>Documentos de <strong style="color:var(--text);">empadronamiento</strong> — completados a mano para cada entrega</li>
+          <li><span class="ico">🛡️</span>Documentos de <strong style="color:var(--text);">seguro</strong> — con todos los datos del vehículo y cliente</li>
+          <li><span class="ico">📜</span><strong style="color:var(--text);">Carta de garantía</strong> por marca y modelo</li>
+          <li><span class="ico">📖</span><strong style="color:var(--text);">Manuales</strong> del vehículo y documentación técnica</li>
+          <li><span class="ico">⚡</span>Ficha de <strong style="color:var(--text);">eficiencia energética</strong> (modelos que aplican)</li>
+          <li><span class="ico">🗺️</span><strong style="color:var(--text);">Mapa de services oficiales</strong> a nivel nacional</li>
+          <li><span class="ico">📱</span>Instructivos de <strong style="color:var(--text);">activación de app</strong> (ej: BYD Connect)</li>
+          <li><span class="ico">🏃</span><strong style="color:var(--text);">Correr detrás del vendedor</strong> para completar información faltante</li>
+        </ul>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="card" style="border-color:rgba(20,184,166,0.25);background:rgba(20,184,166,0.04);">
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:700;margin-bottom:10px;">✓ Con el generador</div>
+          <ul class="prob-list">
+            <li><span class="ico">🖥️</span>El <strong style="color:var(--text);">vendedor</strong> completa el formulario — los datos fluyen automáticamente al sistema</li>
+            <li><span class="ico">📦</span>El sistema detecta el modelo y agrupa <strong style="color:var(--text);">todos los documentos correspondientes</strong> en la carpeta del cliente</li>
+            <li><span class="ico">🖨️</span>Laura solo tiene que <strong style="color:var(--text);">imprimir y armar el sobre</strong> para entregarle al cliente</li>
+            <li><span class="ico">🔔</span>Si falta algún dato, el sistema <strong style="color:var(--text);">no avanza</strong> — sin posibilidad de entregar documentación incompleta</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-color:rgba(139,92,246,0.25);background:rgba(139,92,246,0.04);">
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:#a78bfa;font-weight:700;margin-bottom:8px;">En desarrollo · Próximamente</div>
+          <ul class="prob-list" style="gap:8px;">
+            <li><span class="ico">📲</span>Envío automático de documentos al cliente por <strong style="color:var(--text);">WhatsApp o email</strong></li>
+            <li><span class="ico">🗄️</span><strong style="color:var(--text);">Archivo digital de todos los clientes</strong> — búsqueda en segundos</li>
+            <li><span class="ico">🔔</span>Alertas cuando un vendedor no completó la documentación de una entrega</li>
+            <li><span class="ico">📊</span>Panel de control de entregas pendientes y documentos emitidos</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:700;margin-bottom:6px;">Resultado</div>
+          <div style="font-size:0.86rem;color:var(--sub);">Laura deja de ser el cuello de botella en las entregas. Puede concentrarse en coordinación, control de calidad y atención al cliente — no en buscar datos y confeccionar documentos manualmente.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ROADMAP
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">Lo que viene</div>
+    <h2 class="fade-up">Expansión del <span class="gradient-teal">sistema</span></h2>
+    <p class="small fade-up" style="margin-bottom:28px;max-width:600px;">El generador está diseñado para crecer. Cualquier nuevo documento o plantilla se integra como un módulo más — sin rediseñar todo el sistema.</p>
+
+    <div class="fade-up">
+      <div class="rm-item"><div class="rm-dot rm-soon"></div><div class="rm-text"><h4>Recibo de Seña</h4><p>Formaliza la reserva del vehículo con el monto de seña abonado — uno de los documentos más frecuentes que hoy se hace a mano.</p></div></div>
+      <div class="rm-item"><div class="rm-dot rm-soon"></div><div class="rm-text"><h4>Información de Service por Marca</h4><p>Ficha automática con intervalos de service, tipo de aceite y datos técnicos según la marca y modelo del vehículo adquirido.</p></div></div>
+      <div class="rm-item"><div class="rm-dot rm-mid"></div><div class="rm-text"><h4>Mapa de Services Oficiales</h4><p>Listado de ubicaciones y contactos de los services oficiales de cada marca — adjuntado automáticamente según el vehículo que se vende.</p></div></div>
+      <div class="rm-item"><div class="rm-dot rm-mid"></div><div class="rm-text"><h4>Etiqueta de Eficiencia Energética</h4><p>Para modelos eléctricos e híbridos, se genera automáticamente la ficha de eficiencia energética según normativa vigente.</p></div></div>
+      <div class="rm-item"><div class="rm-dot rm-future"></div><div class="rm-text"><h4>Más documentos por marca</h4><p>Carta de garantía, instructivos de activación de app (BYD Connect, etc.) — el sistema es abierto y escalable sin límite de documentos.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     IMPACTO EN EL EQUIPO
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">Impacto real</div>
+    <h2 class="fade-up">Lo que gana el equipo <span class="gradient-green">cada semana</span></h2>
+    <div class="grid-3 fade-up" style="margin-top:28px;">
+      <div class="card"><span class="b-icon">🕐</span><h3>Tiempo recuperado</h3><p class="small">De 30 min por venta a 5 min. En 30 ventas, eso son 12.5 horas devueltas al equipo para lo que importa: cerrar ventas.</p></div>
+      <div class="card"><span class="b-icon">🧘</span><h3>Menos estrés operativo</h3><p class="small">No hay que recordar qué campos van ni revisar si faltó algo. El sistema guía y valida automáticamente.</p></div>
+      <div class="card"><span class="b-icon">💼</span><h3>Imagen profesional</h3><p class="small">El cliente recibe un documento impecable, con logo y formato uniforme — justo en el momento de cierre.</p></div>
+      <div class="card"><span class="b-icon">🔒</span><h3>Menor riesgo legal</h3><p class="small">Campos obligatorios siempre completos. No es posible generar un contrato con datos faltantes.</p></div>
+      <div class="card"><span class="b-icon">📈</span><h3>Más operaciones por día</h3><p class="small">El tiempo recuperado en papeleo puede usarse en más consultas, test drives y cierres — sin agregar personal.</p></div>
+      <div class="card"><span class="b-icon">🤝</span><h3>Mejor experiencia del cliente</h3><p class="small">El cliente no espera mientras el vendedor busca plantillas y tipea. La operación fluye rápido y transmite profesionalismo.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CIERRE
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+    <div class="label fade-up" style="justify-content:center;">Resumen</div>
+    <h2 class="fade-up">Una herramienta que<br><span class="gradient-teal">ya está funcionando</span></h2>
+    <p class="lead fade-up" style="text-align:center;margin:12px auto 32px;">El Generador de Documentos no es un proyecto futuro — está operativo hoy, reduciendo errores y liberando tiempo del equipo de ventas y de administración.</p>
+
+    <div class="grid-3 fade-up" style="max-width:720px;width:100%;">
+      <div class="final-item"><span class="fi-ico">⚡</span><p>5 min por venta completa (4 documentos)</p></div>
+      <div class="final-item"><span class="fi-ico">🛡️</span><p>Sin errores ni campos faltantes posibles</p></div>
+      <div class="final-item"><span class="fi-ico">📁</span><p>Carpeta digital por cliente, ordenada y accesible</p></div>
+      <div class="final-item"><span class="fi-ico">📈</span><p>12.5 horas recuperadas por cada 30 ventas</p></div>
+      <div class="final-item"><span class="fi-ico">🔧</span><p>Sistema expansible con nuevos documentos</p></div>
+      <div class="final-item"><span class="fi-ico">🔒</span><p>Red interna · Sin servidores externos</p></div>
+    </div>
+
+    <div class="fade-up" style="margin-top:24px;background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2);border-radius:12px;padding:18px 28px;max-width:640px;text-align:left;">
+      <div style="font-size:0.72rem;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:8px;">Transparencia de costos</div>
+      <div style="font-size:0.86rem;color:var(--sub);line-height:1.7;">
+        El sistema corre en la red local — sin suscripciones ni servidores externos. El <strong style="color:var(--text);">único costo variable</strong> es la API de inteligencia artificial que lee automáticamente la foto de la cédula y la libreta del vehículo para completar el formulario sin tipear. Para <strong style="color:var(--text);">40 ventas</strong>, ese costo es aproximadamente <strong style="color:var(--teal);">$50–80 UYU (~$2 USD)</strong> — prácticamente despreciable. Si se prefiere ingresar los datos a mano (sin foto), ese costo baja a <strong style="color:var(--text);">$0</strong> y el tiempo se mantiene igualmente en ~5 min por venta — muy por debajo de los 30 min anteriores.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     COSTO / ROI
+══════════════════════════════════════ -->
+<section class="section">
+  <div class="container">
+    <div class="label fade-up">Costo y retorno</div>
+    <h2 class="fade-up">¿Cuánto cuesta <span class="gradient-teal">realmente</span>?</h2>
+    <p class="small fade-up" style="margin-bottom:28px;max-width:680px;">Desglose basado en tiempo real invertido por venta. Costo horario estimado de personal: $300 UYU/hr.</p>
+
+    <div class="grid-3 fade-up">
+
+      <div class="card" style="border-color:rgba(239,68,68,0.2);background:rgba(239,68,68,0.04);">
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:#f87171;font-weight:700;margin-bottom:10px;">✕ Costo por venta · Sin sistema</div>
+        <div class="row-line"><span style="color:var(--sub);">Vendedor (4 docs × 5 min c/u + impresora ≈ 30 min)</span><span style="font-weight:700;">~$150 UYU</span></div>
+        <div class="row-line"><span style="color:var(--sub);">Laura: gestión, correcciones, búsqueda de info (~20 min)</span><span style="font-weight:700;">~$100 UYU</span></div>
+        <div class="row-line"><span style="color:var(--sub);">API de IA</span><span style="font-weight:700;">$0</span></div>
+        <div class="row-total"><span style="color:#f87171;">Total por venta (~50 min personal)</span><span style="color:#f87171;">~$250 UYU</span></div>
+      </div>
+
+      <div class="card" style="border-color:rgba(20,184,166,0.25);background:rgba(20,184,166,0.04);">
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);font-weight:700;margin-bottom:10px;">✓ Costo por venta · Con sistema</div>
+        <div class="row-line"><span style="color:var(--sub);">Vendedor (formulario + 4 docs generados ≈ 5 min)</span><span style="font-weight:700;">~$25 UYU</span></div>
+        <div class="row-line"><span style="color:var(--sub);">Laura (carpeta lista — solo imprime y arma sobre)</span><span style="font-weight:700;">$0</span></div>
+        <div class="row-line"><span style="color:var(--sub);">API de IA (lectura foto cédula + libreta)</span><span style="font-weight:700;color:var(--teal);">~$2 UYU</span></div>
+        <div class="row-total"><span style="color:var(--teal);">Total por venta (~5 min personal)</span><span style="color:var(--teal);">~$27 UYU</span></div>
+      </div>
+
+      <div class="card" style="border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.04);">
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:.1em;color:#34d399;font-weight:700;margin-bottom:10px;">📈 Ahorro por venta</div>
+        <div style="text-align:center;padding:12px 0 8px;">
+          <div style="font-size:2.6rem;font-weight:900;background:linear-gradient(135deg,#34d399,#10b981);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;">~$223</div>
+          <div style="font-size:0.76rem;color:var(--sub);margin-top:4px;">UYU ahorrados por venta</div>
+          <div style="font-size:1.2rem;font-weight:800;color:#34d399;margin-top:10px;">89% menos costo</div>
+          <div style="font-size:0.74rem;color:var(--sub);margin-top:4px;">de gestión por venta completa</div>
+          <div style="margin-top:10px;font-size:0.74rem;color:var(--sub);background:rgba(16,185,129,0.07);border-radius:8px;padding:8px;line-height:1.5;">Sin IA (datos manuales): $0 API · mismos 5 min/venta · igual de rápido</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 40 ventas proyección -->
+    <div class="fade-up" style="margin-top:16px;">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--teal);font-weight:700;margin-bottom:10px;">Proyección para 40 ventas mensuales · 160 documentos generados</div>
+      <div class="grid-5">
+        <div class="stat-box" style="border-color:rgba(239,68,68,0.2);">
+          <span class="stat-num" style="color:#f87171;font-size:1.4rem;">~$10.000</span>
+          <span class="stat-lbl">UYU · costo mensual sin sistema</span>
+        </div>
+        <div class="stat-box" style="border-color:rgba(20,184,166,0.2);">
+          <span class="stat-num" style="color:var(--teal);font-size:1.4rem;">~$1.080</span>
+          <span class="stat-lbl">UYU · costo mensual con sistema (incl. API)</span>
+        </div>
+        <div class="stat-box" style="border-color:rgba(16,185,129,0.2);">
+          <span class="stat-num" style="color:#34d399;font-size:1.4rem;">~$8.900</span>
+          <span class="stat-lbl">UYU · ahorro mensual en tiempo de personal</span>
+        </div>
+        <div class="stat-box" style="border-color:rgba(16,185,129,0.2);">
+          <span class="stat-num" style="color:#34d399;font-size:1.4rem;">~30 hs</span>
+          <span class="stat-lbl">recuperadas por mes (vendedor + Laura)</span>
+        </div>
+        <div class="stat-box" style="border-color:rgba(245,158,11,0.2);">
+          <span class="stat-num" style="color:#fbbf24;font-size:1.4rem;">~$80</span>
+          <span class="stat-lbl">UYU · único costo variable (API IA ≈ $2 USD)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fade-up" style="margin-top:12px;background:rgba(20,184,166,0.05);border:1px solid rgba(20,184,166,0.18);border-radius:10px;padding:12px 20px;font-size:0.8rem;color:var(--sub);">
+      <strong style="color:var(--teal);">Base de cálculo:</strong> $300 UYU/hr costo horario de personal. Sin sistema: ~30 min por venta (vendedor) + ~20 min Laura = ~50 min. Con sistema: ~5 min por venta solo el vendedor. API IA (foto cédula + libreta): ~$0.015 USD/imagen × 2 imágenes × 40 ventas ≈ $1.20 USD ≈ $48–80 UYU total mensual. Sin usar IA: ingreso manual, mismo tiempo ~5 min, costo API $0.
+    </div>
+  </div>
+</section>
+
+<footer style="border-top:1px solid var(--border);padding:28px;text-align:center;color:var(--muted);font-size:0.78rem;">
+  Videsol · Sistema de herramientas internas · 2026
+</footer>
+
+</div>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+// Stagger children inside grids
+document.querySelectorAll('.grid-2, .grid-3, .grid-4, .grid-5').forEach(grid => {
+  grid.querySelectorAll('.card, .stat-box, .final-item').forEach((el, i) => {
+    el.style.transitionDelay = (i * 70) + 'ms';
+  });
+});
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
