@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Financiamiento — Videsol</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #8b5cf6;
+    --blue: #3b82f6;
+    --cyan: #06b6d4;
+    --green: #10b981;
+    --bg: #030308;
+    --card-bg: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.08);
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ── AURORA BACKGROUND ── */
+  .aurora {
+    position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  }
+  .aurora::before {
+    content: '';
+    position: absolute;
+    top: -40%; left: -20%;
+    width: 80%; height: 80%;
+    background: radial-gradient(ellipse, rgba(139,92,246,0.15) 0%, transparent 70%);
+    animation: drift1 18s ease-in-out infinite alternate;
+  }
+  .aurora::after {
+    content: '';
+    position: absolute;
+    bottom: -30%; right: -10%;
+    width: 70%; height: 70%;
+    background: radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 70%);
+    animation: drift2 22s ease-in-out infinite alternate;
+  }
+  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(5%,8%) scale(1.1); } }
+  @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-6%,-5%) scale(1.08); } }
+
+  /* ── GRID OVERLAY ── */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ── LAYOUT ── */
+  .content { position: relative; z-index: 1; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    padding: 16px 24px;
+    background: rgba(3,3,8,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-size: 1rem; font-weight: 700; letter-spacing: 0.05em;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+  }
+  .nav-tag {
+    font-size: 0.72rem; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 20px;
+    padding: 4px 12px; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 120px 24px 100px;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(139,92,246,0.1);
+    border: 1px solid rgba(139,92,246,0.3);
+    border-radius: 30px; padding: 6px 16px;
+    font-size: 0.78rem; color: #a78bfa; letter-spacing: 0.05em;
+    text-transform: uppercase; margin-bottom: 32px;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #a78bfa;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.5; transform:scale(1.4); } }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, #c4b5fd 0%, #818cf8 40%, #38bdf8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 1.15rem; color: var(--muted);
+    max-width: 620px; margin: 0 auto 48px;
+  }
+  .hero-cta {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    color: white; text-decoration: none;
+    padding: 14px 32px; border-radius: 12px;
+    font-weight: 600; font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 30px rgba(139,92,246,0.35);
+  }
+  .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(139,92,246,0.5); }
+  .hero-cta svg { width: 18px; height: 18px; }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 0 24px 100px;
+    max-width: 1100px;
+    margin-left: auto; margin-right: auto;
+  }
+  .stat-item {
+    background: var(--card-bg);
+    padding: 28px 24px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+  }
+  .stat-number {
+    font-size: 2.2rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--purple), var(--cyan));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    display: block; line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* ── SECTION TITLES ── */
+  .section { padding: 80px 24px; }
+  .section-label {
+    font-size: 0.72rem; color: var(--purple); text-transform: uppercase;
+    letter-spacing: 0.12em; font-weight: 600; margin-bottom: 12px;
+    display: block;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .section-sub { color: var(--muted); font-size: 1.05rem; max-width: 520px; margin-bottom: 56px; }
+
+  /* ── FEATURE GRID ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.2s;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(139,92,246,0.06), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feature-card:hover { border-color: rgba(139,92,246,0.4); transform: translateY(-2px); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+  .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .feature-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+
+  /* icon accent colors */
+  .ic-purple { background: rgba(139,92,246,0.15); }
+  .ic-blue   { background: rgba(59,130,246,0.15); }
+  .ic-cyan   { background: rgba(6,182,212,0.15); }
+  .ic-green  { background: rgba(16,185,129,0.15); }
+  .ic-amber  { background: rgba(245,158,11,0.15); }
+  .ic-pink   { background: rgba(236,72,153,0.15); }
+  .ic-indigo { background: rgba(99,102,241,0.15); }
+  .ic-teal   { background: rgba(20,184,166,0.15); }
+
+  /* ── VS SECTION (side by side) ── */
+  .vs-section { padding: 80px 24px; }
+  .vs-grid { display: grid; grid-template-columns: 1fr 60px 1fr; gap: 0; align-items: start; }
+  @media (max-width: 700px) { .vs-grid { grid-template-columns: 1fr; } .vs-divider { display: none; } }
+  .vs-col { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .vs-col.bad  { border-color: rgba(239,68,68,0.2); }
+  .vs-col.good { border-color: rgba(16,185,129,0.25); }
+  .vs-header {
+    padding: 16px 24px;
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .vs-header.bad  { background: rgba(239,68,68,0.08); color: #f87171; border-bottom: 1px solid rgba(239,68,68,0.15); }
+  .vs-header.good { background: rgba(16,185,129,0.08); color: #34d399; border-bottom: 1px solid rgba(16,185,129,0.15); }
+  .vs-list { list-style: none; padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .vs-list li { font-size: 0.88rem; color: var(--muted); display: flex; gap: 10px; align-items: flex-start; }
+  .vs-list li span.ico { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+  .vs-divider { display: flex; align-items: center; justify-content: center; }
+  .vs-badge {
+    width: 44px; height: 44px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.75rem; color: var(--muted);
+  }
+
+  /* ── HOW IT WORKS ── */
+  .steps { display: flex; flex-direction: column; gap: 0; position: relative; }
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 21px; top: 44px; bottom: 44px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--purple), var(--blue), transparent);
+  }
+  .step { display: flex; gap: 24px; align-items: flex-start; padding: 28px 0; }
+  .step-num {
+    width: 44px; height: 44px; flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.9rem;
+    box-shadow: 0 0 20px rgba(139,92,246,0.4);
+  }
+  .step-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .step-content p  { font-size: 0.88rem; color: var(--muted); }
+
+  /* ── USE CASES ── */
+  .use-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+  .use-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .use-card:hover { border-color: rgba(59,130,246,0.4); }
+  .use-tag {
+    display: inline-block;
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 4px 10px; border-radius: 20px; margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .tag-blue  { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .tag-green { background: rgba(16,185,129,0.12); color: #34d399; }
+  .tag-purple{ background: rgba(139,92,246,0.12); color: #a78bfa; }
+  .tag-cyan  { background: rgba(6,182,212,0.12);  color: #22d3ee; }
+  .use-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+  .use-card p  { font-size: 0.86rem; color: var(--muted); line-height: 1.65; }
+
+  /* ── CTA FINAL ── */
+  .cta-section {
+    padding: 100px 24px;
+    text-align: center;
+  }
+  .cta-box {
+    max-width: 680px; margin: 0 auto;
+    background: rgba(139,92,246,0.05);
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 24px;
+    padding: 64px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-box::before {
+    content: '';
+    position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+    width: 300px; height: 300px;
+    background: radial-gradient(ellipse, rgba(139,92,246,0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-box h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin-bottom: 16px; }
+  .cta-box p  { color: var(--muted); margin-bottom: 36px; font-size: 1rem; }
+  .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    color: white; text-decoration: none;
+    padding: 13px 28px; border-radius: 10px;
+    font-weight: 600; font-size: 0.95rem;
+    box-shadow: 0 0 25px rgba(139,92,246,0.35);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(139,92,246,0.5); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text); text-decoration: none;
+    padding: 13px 28px; border-radius: 10px;
+    font-weight: 600; font-size: 0.95rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .btn-secondary:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.04); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* ── ANIMATIONS ON SCROLL ── */
+  .fade-up {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: var(--border); margin: 0 24px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .hero { padding: 80px 24px 60px; }
+    .cta-box { padding: 40px 24px; }
+    .steps::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora"></div>
+<div class="grid-bg"></div>
+
+<div class="content">
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">Videsol</span>
+    <span class="nav-tag">Calculadora de Financiamiento</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      Herramienta interna · Disponible ahora
+    </div>
+    <h1>
+      La respuesta en<br>
+      <span class="gradient-text">menos de 2 minutos</span>
+    </h1>
+    <p>
+      Simulador de financiamiento diseñado para el vendedor, no para el banco.
+      Sin formularios, sin datos sensibles, sin demoras — desde el celular, en cualquier lugar.
+    </p>
+    <a href="videsol-calculadora-financiamientoV2.html" class="hero-cta">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Ver demo en vivo
+    </a>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="container">
+    <div class="stats-bar fade-up">
+      <div class="stat-item">
+        <span class="stat-number">&lt;2 min</span>
+        <span class="stat-label">Tiempo de simulación</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">6</span>
+        <span class="stat-label">Plazos: 12 a 72 meses</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">0</span>
+        <span class="stat-label">Datos sensibles requeridos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">Disponible en celular</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="container">
+      <span class="section-label fade-up">¿Por qué importa?</span>
+      <h2 class="section-title fade-up">Todo lo que gana el equipo<br>de ventas</h2>
+      <p class="section-sub fade-up">Una herramienta que transforma cada conversación en una decisión concreta.</p>
+
+      <div class="feature-grid">
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-purple">⚡</div>
+          <h3>Velocidad real</h3>
+          <p>El simulador arroja resultados al instante. Ningún formulario bancario, ninguna llamada, ninguna espera. El cliente tiene los números en la mano mientras todavía está entusiasmado.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-blue">🔒</div>
+          <h3>Sin datos sensibles</h3>
+          <p>No se le pide cédula, ingresos, garantías ni referencias. El cliente simula libremente sin comprometerse, lo que baja la guardia y facilita la conversación.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-cyan">📱</div>
+          <h3>Desde el celular, en cualquier lugar</h3>
+          <p>Funciona en cualquier dispositivo con navegador. El vendedor la abre en el celular en el test drive, en la calle, en la sala de espera — sin necesidad de volver al escritorio.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-green">📊</div>
+          <h3>Desglose completo de cuotas</h3>
+          <p>Muestra los 6 plazos disponibles (12, 24, 36, 48, 60, 72 meses) en una sola pantalla. El cliente compara y elige el que más le cierra sin que el vendedor tenga que calcular nada.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-amber">⚖️</div>
+          <h3>Crédito normal vs. Tasa 0%</h3>
+          <p>Muestra ambas opciones lado a lado para que el cliente entienda claramente qué conviene según su situación. Transparencia que genera confianza y acelera el cierre.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-pink">💰</div>
+          <h3>Costos adicionales incluidos</h3>
+          <p>No solo la cuota pura — incluye seguros, gastos administrativos y costo total del crédito. El cliente sabe exactamente qué va a pagar antes de firmar.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-indigo">🏎️</div>
+          <h3>Válida para 0km y usados</h3>
+          <p>Funciona para cualquier monto, no solo vehículos nuevos. El equipo de usados también puede simular financiamientos en el momento de la negociación.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-teal">🧠</div>
+          <h3>Sin depender del banco</h3>
+          <p>No requiere conectarse a sistemas de Santander ni a ningún sistema externo. La herramienta es nuestra — siempre disponible, sin caídas, sin tiempos de espera del otro lado.</p>
+        </div>
+
+        <div class="feature-card fade-up">
+          <div class="feature-icon ic-purple">🔄</div>
+          <h3>Múltiples simulaciones en segundos</h3>
+          <p>El vendedor puede ajustar el monto o la entrada en tiempo real y ver cómo cambian las cuotas al instante. Negociación dinámica, no estática.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- VS SECTION -->
+  <section class="vs-section">
+    <div class="container">
+      <span class="section-label fade-up">Comparativa</span>
+      <h2 class="section-title fade-up">Antes vs. ahora</h2>
+      <p class="section-sub fade-up">Así era simular un financiamiento sin esta herramienta.</p>
+
+      <div class="vs-grid fade-up">
+        <div class="vs-col bad">
+          <div class="vs-header bad">✕ &nbsp;Sin la calculadora</div>
+          <ul class="vs-list">
+            <li><span class="ico">😓</span> El vendedor llama al banco y espera respuesta</li>
+            <li><span class="ico">📋</span> Se le pide al cliente cédula, ingresos y garantías</li>
+            <li><span class="ico">⏳</span> El proceso puede demorar 20–40 minutos o días</li>
+            <li><span class="ico">📞</span> Si el banco no atiende, la consulta queda para después</li>
+            <li><span class="ico">🖥️</span> Solo se puede hacer desde el escritorio de la agencia</li>
+            <li><span class="ico">🤷</span> El cliente se va sin saber el monto de la cuota</li>
+            <li><span class="ico">❌</span> No hay comparación entre plazos ni entre tasa 0% y crédito normal</li>
+          </ul>
+        </div>
+
+        <div class="vs-divider"><div class="vs-badge">VS</div></div>
+
+        <div class="vs-col good">
+          <div class="vs-header good">✓ &nbsp;Con la calculadora</div>
+          <ul class="vs-list">
+            <li><span class="ico">⚡</span> Resultado inmediato, sin llamadas ni esperas</li>
+            <li><span class="ico">🔒</span> No se requiere ningún dato personal del cliente</li>
+            <li><span class="ico">⏱️</span> Simulación completa en menos de 2 minutos</li>
+            <li><span class="ico">📱</span> Disponible en cualquier momento y desde cualquier lugar</li>
+            <li><span class="ico">🏎️</span> En el test drive, en la calle, en la sala de espera</li>
+            <li><span class="ico">📊</span> El cliente ve los 6 plazos y elige con información completa</li>
+            <li><span class="ico">✅</span> Comparación automática tasa 0% vs. crédito normal</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <div class="container">
+      <span class="section-label fade-up">Flujo de uso</span>
+      <h2 class="section-title fade-up">Así de simple</h2>
+      <p class="section-sub fade-up">No hay curva de aprendizaje. Cualquier vendedor la usa desde el primer día.</p>
+
+      <div class="steps fade-up">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>El cliente pregunta cuánto sería la cuota</h3>
+            <p>El escenario más común en cualquier conversación de venta. Antes requería una llamada al banco. Ahora se resuelve en el momento.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>El vendedor abre la app en el celular</h3>
+            <p>Directo al navegador. Sin descargar nada, sin logueos, sin esperar que cargue algún sistema interno. Disponible al instante.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Ingresa el monto del vehículo y la entrada (si hay)</h3>
+            <p>Dos campos. Nada más. No se requiere ningún dato del cliente.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <h3>La calculadora muestra todos los plazos al instante</h3>
+            <p>12, 24, 36, 48, 60 y 72 meses — con cuota, costo total y comparación tasa 0%. El cliente ve el desglose completo en una sola pantalla.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <h3>El cliente elige y la conversación avanza</h3>
+            <p>Con información clara en la mano, el cliente puede tomar una decisión. El vendedor cierra más rápido y con mayor confianza.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- USE CASES -->
+  <section class="section">
+    <div class="container">
+      <span class="section-label fade-up">Casos de uso</span>
+      <h2 class="section-title fade-up">¿Cuándo se usa?</h2>
+      <p class="section-sub fade-up">La calculadora es útil en cada etapa del proceso de venta.</p>
+
+      <div class="use-grid">
+        <div class="use-card fade-up">
+          <span class="use-tag tag-blue">0km</span>
+          <h3>Sala de ventas — 0km</h3>
+          <p>El cliente llega interesado en un modelo. En vez de decirle "lo consulto y te llamo", el vendedor simula el financiamiento en el momento y mantiene vivo el entusiasmo.</p>
+        </div>
+        <div class="use-card fade-up">
+          <span class="use-tag tag-green">Usados</span>
+          <h3>Negociación de vehículo usado</h3>
+          <p>La calculadora funciona con cualquier monto. El equipo de usados puede simular financiamientos durante la negociación de precio sin depender de otra área.</p>
+        </div>
+        <div class="use-card fade-up">
+          <span class="use-tag tag-purple">Test drive</span>
+          <h3>Durante el test drive</h3>
+          <p>Mientras el cliente todavía está manejando o acaba de bajarse, el vendedor ya tiene la simulación lista en el celular. Se aprovecha el momento de mayor emoción.</p>
+        </div>
+        <div class="use-card fade-up">
+          <span class="use-tag tag-cyan">Remoto</span>
+          <h3>Consulta por WhatsApp o teléfono</h3>
+          <p>Un cliente pregunta por precio de cuota sin venir a la agencia. El vendedor simula en segundos y responde con un desglose completo — sin pedir que venga primero.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box fade-up">
+        <h2>Probala en vivo ahora</h2>
+        <p>La demo es funcional. Ingresá cualquier monto y vé el desglose completo de cuotas, costos y comparativas en tiempo real.</p>
+        <div class="btn-group">
+          <a href="videsol-calculadora-financiamientoV2.html" class="btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 8 16 12 12 16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            Abrir calculadora
+          </a>
+          <a href="#" class="btn-secondary" onclick="history.back(); return false;">
+            ← Volver al hub
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Videsol · Sistema de herramientas internas · 2026</p>
+  </footer>
+
+</div>
+
+<script>
+  // Scroll animation observer
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const delay = el.dataset.delay || 0;
+        setTimeout(() => el.classList.add('visible'), delay);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  // Stagger cards within grids
+  document.querySelectorAll('.feature-grid, .use-grid, .stats-bar').forEach(grid => {
+    grid.querySelectorAll('.feature-card, .use-card, .stat-item').forEach((card, i) => {
+      card.dataset.delay = i * 80;
+    });
+  });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Animated counter for stats
+  function animateCounter(el, target, suffix = '') {
+    const duration = 1200;
+    const start = performance.now();
+    const update = (time) => {
+      const progress = Math.min((time - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const val = typeof target === 'number' ? Math.round(target * ease) : target;
+      if (typeof target === 'number') el.textContent = val + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+</script>
+</body>
+</html>
